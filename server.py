@@ -592,6 +592,22 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
             return
 
         # AI 智能生成全新例句
+        # 保存自定义 Key (方便外部下载者一键生效)
+        if parsed_url.path == "/api/save_keys":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length)
+            try:
+                data = json.loads(body.decode("utf-8"))
+                global DASHSCOPE_KEY, GEMINI_KEY
+                if data.get("dashscope_key"):
+                    DASHSCOPE_KEY = data.get("dashscope_key").strip()
+                if data.get("gemini_key"):
+                    GEMINI_KEY = data.get("gemini_key").strip()
+                self.send_json_resp(200, {"ok": True})
+            except Exception as e:
+                self.send_json_resp(500, {"ok": False, "error": str(e)})
+            return
+
         if parsed_url.path == "/api/generate_sentence":
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length)

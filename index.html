@@ -1393,6 +1393,11 @@ main {
       </svg>
       <span>技巧</span>
     </button>
+    <!-- 设置齿轮 -->
+    <button class="btn btn-secondary btn-sm" id="btnSettings" title="配置 AI 大模型与语音密钥">
+      <span style="font-size:14px;">⚙️</span>
+      <span>设置</span>
+    </button>
   </div>
 </header>
 
@@ -1600,6 +1605,55 @@ main {
     </div>
   </aside>
 </main>
+
+
+<!-- 模态框 3：自定义 AI 与密钥设置中心 -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-window" style="max-width:560px;">
+    <div class="modal-header">
+      <h3>
+        <span>⚙️</span>
+        <span>AI 大模型与发音配置</span>
+        <span class="brand-badge" style="background:#eef2f6;color:#3b5998;">零配置即可离线用</span>
+      </h3>
+      <button class="btn btn-secondary btn-sm" id="btnCloseSettingsModal" style="padding:4px 8px;">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--ink-soft);line-height:1.6;background:var(--panel-alt);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);">
+        💡 <b>小白开箱即用说明</b>：不填任何 Key 也完全不影响使用！「词来」自带 19.8 万离线词库、拼音、离线生活例句、一键复制与课后闪卡导出。<br>
+        如果您需要启用<b>通义千问极速出题</b>或<b>豆包超拟人发音</b>，可在此保存您的专属 Key（保存在本机，绝不上云）。
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="font-size:13px;">
+          <span>通义千问 API Key (阿里百炼 DashScope)</span>
+          <a href="https://bailian.console.aliyun.com/" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px;">获取免费额度 ↗</a>
+        </label>
+        <input type="password" id="inputDashscopeKey" class="editable-field" placeholder="sk-..." autocomplete="off">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="font-size:13px;">
+          <span>Google Gemini API Key (可选)</span>
+          <a href="https://aistudio.google.com/" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px;">免费申请 ↗</a>
+        </label>
+        <input type="password" id="inputGeminiKey" class="editable-field" placeholder="AIzaSy..." autocomplete="off">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="font-size:13px;">
+          <span>火山引擎豆包语音 AppID / Token (可选)</span>
+        </label>
+        <input type="password" id="inputVolcKey" class="editable-field" placeholder="如需豆包思思超拟人音色可填入" autocomplete="off">
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;">
+        <button class="btn btn-secondary" id="btnCancelSettings">取消</button>
+        <button class="btn btn-primary" id="btnSaveSettings">保存并生效</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- 模态框 1：随堂练习生成中心 -->
 <div class="modal-overlay" id="exerciseModal">
@@ -3698,6 +3752,44 @@ document.addEventListener('DOMContentLoaded', () => {
       "3. 随堂练习：点击右下角「AI 一键生成随堂练习」，自动根据今日生词生成互动选词填空，可一键复制发给学生互动！\n" +
       "4. 快捷键盲操：按「/」查词，按「Cmd+C」复制，按「Cmd+S」收藏。"
     );
+  });
+
+  
+  // 18. 设置弹窗逻辑
+  $('#btnSettings').addEventListener('click', () => {
+    $('#inputDashscopeKey').value = localStorage.getItem('cilai_dashscope_key') || '';
+    $('#inputGeminiKey').value = localStorage.getItem('cilai_gemini_key') || '';
+    $('#inputVolcKey').value = localStorage.getItem('cilai_volc_key') || '';
+    $('#settingsModal').classList.add('active');
+  });
+
+  $('#btnCloseSettingsModal').addEventListener('click', () => {
+    $('#settingsModal').classList.remove('active');
+  });
+  $('#btnCancelSettings').addEventListener('click', () => {
+    $('#settingsModal').classList.remove('active');
+  });
+
+  $('#btnSaveSettings').addEventListener('click', async () => {
+    const qwen = $('#inputDashscopeKey').value.trim();
+    const gemini = $('#inputGeminiKey').value.trim();
+    const volc = $('#inputVolcKey').value.trim();
+
+    localStorage.setItem('cilai_dashscope_key', qwen);
+    localStorage.setItem('cilai_gemini_key', gemini);
+    localStorage.setItem('cilai_volc_key', volc);
+
+    try {
+      await fetch("http://127.0.0.1:8765/api/save_keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dashscope_key: qwen, gemini_key: gemini, volc_key: volc })
+      });
+    } catch(e) {}
+
+    showToast("✨ 设置已保存并即时生效！");
+    $('#settingsModal').classList.remove('active');
+    checkServer();
   });
 
   lookupWord("顺便");

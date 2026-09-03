@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "node scripts/start.js",
-    "package:mac": "node scripts/package-mac.js"
+    "package:mac": "node scripts/package-mac.js",
+    "build:dmg": "node scripts/make-dmg.js"
   },
   "author": "Yiyue",
   "license": "MIT"
