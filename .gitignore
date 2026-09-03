@@ -1,0 +1,20 @@
+# 依赖与产物
+node_modules/
+dist/
+build/mac/
+__pycache__/
+*.pyc
+*.pyo
+
+# 运行数据与私密凭据
+data/history/
+data/audio_cache/
+*.env
+*.pem
+*.key
+.DS_Store
+
+# 临时文件
+*.bak
+*.tmp
+*.miniapp

@@ -1,0 +1,12 @@
+{
+  "name": "cilai",
+  "version": "1.0.0",
+  "description": "词来 · 课堂生词速查与课后闪卡助手",
+  "main": "main.js",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "package:mac": "node scripts/package-mac.js"
+  },
+  "author": "Yiyue",
+  "license": "MIT"
+}

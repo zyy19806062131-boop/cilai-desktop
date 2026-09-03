@@ -1,0 +1,3707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>词来 · 课堂生词速查与闪卡助手</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23c26538'/><text x='32' y='44' font-size='36' font-family='serif' fill='%23fff' text-anchor='middle'>词</text></svg>">
+<style>
+:root {
+  --bg: #f8f6f2;
+  --panel: #ffffff;
+  --panel-alt: #f3efe9;
+  --line: #e3dcd3;
+  --line-focus: #c26538;
+  --ink: #2b2622;
+  --ink-soft: #6e6760;
+  --ink-dim: #9e958c;
+  --primary: #c26538;
+  --primary-hover: #b05429;
+  --primary-light: #faede6;
+  --accent: #2e6b52;
+  --accent-light: #e8f3ee;
+  --gold: #b3822a;
+  --gold-light: #fbf5e6;
+  --danger: #b83c34;
+  --danger-light: #fceeed;
+  --shadow-sm: 0 2px 8px rgba(43,38,34,0.04);
+  --shadow-md: 0 6px 20px rgba(43,38,34,0.07), inset 0 1px 0 rgba(255,255,255,0.8);
+  --shadow-lg: 0 16px 36px rgba(43,38,34,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+  --radius: 16px;
+  --radius-sm: 9px;
+  --font-serif: "Songti SC", "Source Han Serif SC", "STSong", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #181716;
+  --panel: #232220;
+  --panel-alt: #2b2926;
+  --line: #3d3a36;
+  --line-focus: #d97847;
+  --ink: #ece7e1;
+  --ink-soft: #aba399;
+  --ink-dim: #756e65;
+  --primary: #d97847;
+  --primary-hover: #e3895b;
+  --primary-light: #38251a;
+  --accent: #4a9978;
+  --accent-light: #1c3327;
+  --gold: #d4a044;
+  --gold-light: #382d18;
+  --danger: #e0564e;
+  --danger-light: #381a18;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-md: 0 6px 20px rgba(0,0,0,0.35);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+::-webkit-scrollbar-track { background: transparent; }
+
+.c4d-png-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 3px 5px rgba(180,80,30,0.22));
+  flex-shrink: 0;
+}
+.c4d-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.14));
+  flex-shrink: 0;
+}
+.c4d-icon-lg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 3px 6px rgba(180,80,30,0.2));
+}
+
+/* 顶部导航栏 (macOS 原生红绿灯拖拽) */
+header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  -webkit-app-region: drag;
+}
+
+body.is-electron header {
+  padding-left: 88px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+.brand-badge {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(194,101,56,0.2);
+}
+.session-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  align-items: stretch;
+  gap: 10px;
+  flex: 1;
+  max-width: 960px;
+  -webkit-app-region: no-drag;
+}
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--panel-alt);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  height: 38px;
+  box-sizing: border-box;
+  min-width: 0;
+  -webkit-app-region: no-drag;
+}
+.session-info-label {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.session-info input, .session-info select {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  min-width: 0;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.session-info input.student-name { width: 68px; flex: none; font-weight: 700; color: var(--primary); }
+.session-info input.lesson-date { width: 84px; flex: none; color: var(--ink-soft); font-size: 12px; }
+.session-info select {
+  width: 100%;
+}
+.lang-picker-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+.lang-picker-trigger {
+  width: 100%;
+  justify-content: space-between;
+}
+#langPickerCurrentLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+  text-align: left;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.4, 1);
+  user-select: none;
+  -webkit-app-region: no-drag;
+}
+.btn:hover {
+  transform: translateY(-1.5px);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(194,101,56,0.25);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 6px 18px rgba(194,101,56,0.35);
+}
+.btn-secondary {
+  background: var(--panel-alt);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn-secondary:hover { border-color: var(--primary); color: var(--primary); background: var(--panel); }
+.btn-accent {
+  background: var(--accent-light);
+  border-color: rgba(46,107,82,0.3);
+  color: var(--accent);
+}
+.btn-accent:hover { background: var(--accent); color: #fff; }
+.btn-danger {
+  background: var(--danger-light);
+  border-color: rgba(184,60,52,0.3);
+  color: var(--danger);
+}
+.btn-sm { padding: 4px 9px; font-size: 12px; }
+
+/* 语言选择器弹窗与触发器样式 */
+.lang-picker-wrapper {
+  position: relative;
+  display: inline-block;
+  -webkit-app-region: no-drag;
+}
+.lang-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.lang-picker-trigger:hover {
+  background: rgba(194,101,56,0.12);
+}
+.lang-picker-trigger .arrow-down {
+  font-size: 10px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+.lang-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 380px;
+  max-height: 480px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 36px rgba(45,35,28,0.22);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: langPop 0.18s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+.lang-picker-dropdown.active {
+  display: flex;
+}
+@keyframes langPop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.lang-picker-header {
+  padding: 10px 12px;
+  background: var(--panel-alt);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lang-search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  transition: border-color 0.15s ease;
+}
+.lang-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(194,101,56,0.15);
+}
+.lang-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--ink);
+  width: 100%;
+}
+.lang-search-box input::placeholder {
+  color: var(--ink-dim);
+}
+.lang-picker-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.lang-picker-tabs::-webkit-scrollbar { height: 3px; }
+.lang-picker-tab-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.lang-picker-tab-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.lang-picker-tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.lang-picker-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lang-continent-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lang-continent-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lang-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  font-size: 12.5px;
+}
+.lang-item-row:hover {
+  background: var(--primary-light);
+}
+.lang-item-row.selected {
+  background: var(--primary-light);
+  font-weight: 700;
+  color: var(--primary);
+}
+.lang-item-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.lang-code-pill {
+  font-size: 10px;
+  font-family: monospace;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.06);
+  color: var(--ink-soft);
+}
+.lang-item-native {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-left: 4px;
+}
+.lang-fav-star {
+  font-size: 14px;
+  color: var(--line-dark);
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.lang-fav-star:hover {
+  transform: scale(1.25);
+  color: #ffb800;
+}
+.lang-fav-star.favorited {
+  color: #f5a623;
+}
+
+
+.kbd-hint {
+  font-size: 10.5px;
+  font-family: monospace;
+  background: rgba(0,0,0,0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  opacity: 0.85;
+}
+
+/* 主体分栏 (左右等高锁定) */
+main {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 14px 22px 18px;
+  gap: 20px;
+  overflow: hidden;
+}
+.desk-col {
+  flex: 1.18;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.list-col {
+  flex: 0.82;
+  display: flex;
+  flex-direction: column;
+  min-width: 340px;
+  max-width: 460px;
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 920px) {
+  html, body {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  header {
+    position: static;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  body.is-electron header {
+    padding-left: 14px;
+  }
+  .session-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    width: 100%;
+    max-width: none;
+  }
+  main {
+    flex-direction: column !important;
+    overflow: visible !important;
+    height: auto !important;
+    flex: none !important;
+    padding: 12px 14px 24px !important;
+  }
+  .desk-col, .list-col {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+  .list-col {
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  .card-box {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+  .card-body {
+    overflow: visible !important;
+    height: auto !important;
+    flex: none !important;
+  }
+  .list-panel {
+    height: 520px !important;
+  }
+}
+
+/* 搜索栏卡片 */
+.search-card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  padding: 18px 20px;
+}
+.search-bar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-input {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 13px 115px 13px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--line);
+  background: var(--panel-alt);
+  color: var(--ink);
+  outline: none;
+  transition: all 0.2s ease;
+  user-select: text;
+}
+.search-input:focus {
+  border-color: var(--line-focus);
+  background: var(--panel);
+  box-shadow: 0 0 0 4px rgba(194,101,56,0.12);
+}
+.search-btn-inside {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  bottom: 7px;
+  display: flex;
+  align-items: center;
+}
+.quick-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+.tag-chip {
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: 0.12s;
+  font-weight: 500;
+}
+.tag-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--panel);
+}
+
+/* 当前词卡展示区 */
+.card-box {
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card-header {
+  flex: 0 0 auto;
+}
+.card-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.card-actions {
+  flex: 0 0 auto;
+}
+.card-header {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.word-title-area {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.word-hanzi {
+  font-family: var(--font-serif);
+  font-size: 46px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  cursor: pointer;
+  border-bottom: 2px dashed transparent;
+  user-select: text;
+}
+.word-hanzi:hover { border-bottom-color: var(--line-focus); }
+.word-pinyin {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  user-select: text;
+}
+.word-badge {
+  font-size: 11.5px;
+  background: var(--gold-light);
+  color: var(--gold);
+  border: 1px solid rgba(179,130,42,0.3);
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+.audio-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 6px;
+  transition: 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.audio-btn:hover { background: var(--primary-light); }
+
+.card-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.field-tag-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.tag-en { background: #eef2f6; color: #3b5998; }
+.tag-native { background: #faede6; color: var(--primary); }
+
+.editable-field {
+  padding: 9px 13px;
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.5;
+  outline: none;
+  transition: 0.15s;
+  user-select: text;
+}
+.editable-field:focus {
+  border-color: var(--line-focus);
+  background: var(--panel);
+  box-shadow: 0 0 0 3px rgba(194,101,56,0.1);
+}
+
+/* 释义双语并列排版 */
+.defs-row {
+  display: flex;
+  gap: 12px;
+}
+.defs-row .field-group {
+  flex: 1;
+}
+
+/* 例句专区与场景轮换工具栏 */
+.sentence-box {
+  background: var(--panel-alt);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sent-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.scenario-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.scenario-chip {
+  font-size: 11.5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: 0.12s;
+}
+.scenario-chip:hover, .scenario-chip.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  font-weight: 600;
+}
+.history-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.step-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+.step-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+.sent-zh {
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sent-py {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.sent-en-row, .sent-native-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 核心操作按钮组 */
+.card-actions {
+  padding: 16px 24px;
+  background: var(--panel-alt);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.copy-btn-primary {
+  background: var(--primary);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 14px rgba(194,101,56,0.28);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.copy-btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(194,101,56,0.38);
+}
+.copy-btn-primary:active { transform: translateY(1px); }
+
+.collect-btn {
+  background: var(--gold);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.collect-btn:hover { background: #9e7121; transform: translateY(-1.5px); }
+.collect-btn:active { transform: translateY(1px); }
+.collect-btn.collected {
+  background: var(--accent);
+}
+
+.copy-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.copy-chip {
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 5px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: 0.12s;
+  font-weight: 500;
+}
+.copy-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* 右侧：今日生词本 */
+.list-panel {
+  height: 100%;
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.list-header {
+  flex: 0 0 auto;
+}
+.list-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+.list-footer {
+  flex: 0 0 auto;
+}
+.list-header {
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.list-title {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.list-count-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+.list-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.empty-tip {
+  text-align: center;
+  color: var(--ink-dim);
+  padding: 45px 20px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.vocab-item {
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: 0.15s;
+}
+.vocab-item:hover {
+  border-color: var(--primary);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+}
+.vocab-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  cursor: pointer;
+}
+.vocab-item-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.vocab-item-word {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.vocab-item-py {
+  font-size: 13px;
+  color: var(--primary);
+}
+.vocab-item-dual {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vocab-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.list-footer {
+  padding: 15px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--panel-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.generate-card-btn {
+  background: linear-gradient(135deg, #c26538 0%, #b05429 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 11px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(194,101,56,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.generate-card-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(194,101,56,0.4);
+}
+.generate-card-btn:active { transform: translateY(1px); }
+
+/* Toast 提示条 */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background: #202020;
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#toast.on {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* 模态框全局样式 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal-window {
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.2s ease-out;
+}
+@keyframes modalPop {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  font-size: 17.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-body {
+  padding: 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.export-option-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  background: var(--panel-alt);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: 0.15s;
+}
+.export-option-card:hover {
+  border-color: var(--primary);
+  background: var(--panel);
+}
+.export-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.export-option-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-option-desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.preview-text-box {
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: pre-wrap;
+  max-height: 140px;
+  overflow-y: auto;
+  user-select: text;
+}
+
+/* 随堂练习卡片样式 */
+.exercise-card {
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.exercise-q {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.exercise-py {
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.exercise-trans {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.exercise-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.option-btn {
+  padding: 5px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: 0.15s;
+}
+.option-btn:hover { border-color: var(--primary); color: var(--primary); }
+.option-btn.correct { background: var(--accent); color: #fff; border-color: var(--accent); }
+.option-btn.wrong { background: var(--danger); color: #fff; border-color: var(--danger); }
+.exercise-answer-box {
+  background: #fdfbf7;
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  display: none;
+}
+.exercise-answer-box.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- 全局 SVG 3D C4D 滤镜与渐变定义 -->
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="c4d-grad-spk" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff9a6c"/>
+      <stop offset="70%" stop-color="#c25220"/>
+      <stop offset="100%" stop-color="#8f300c"/>
+    </radialGradient>
+    <linearGradient id="c4d-grad-cone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffbe99"/>
+      <stop offset="60%" stop-color="#d96633"/>
+      <stop offset="100%" stop-color="#a83c13"/>
+    </linearGradient>
+    <radialGradient id="c4d-grad-star" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffe380"/>
+      <stop offset="50%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#ba750b"/>
+    </radialGradient>
+    <linearGradient id="c4d-grad-clip" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f27d49"/>
+      <stop offset="100%" stop-color="#b84518"/>
+    </linearGradient>
+    <linearGradient id="c4d-grad-paper" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#faece5"/>
+    </linearGradient>
+    <radialGradient id="c4d-grad-spark" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffe680"/>
+      <stop offset="60%" stop-color="#ff9933"/>
+      <stop offset="100%" stop-color="#cc5500"/>
+    </radialGradient>
+    <radialGradient id="c4d-grad-bulb" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff5a6"/>
+      <stop offset="60%" stop-color="#ffba26"/>
+      <stop offset="100%" stop-color="#cf7a08"/>
+    </radialGradient>
+    <radialGradient id="c4d-grad-bubble1" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff9a6c"/>
+      <stop offset="70%" stop-color="#c25220"/>
+      <stop offset="100%" stop-color="#8f300c"/>
+    </radialGradient>
+    <radialGradient id="c4d-grad-bubble2" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#7ae0b8"/>
+      <stop offset="70%" stop-color="#2a8c66"/>
+      <stop offset="100%" stop-color="#14573d"/>
+    </radialGradient>
+    <linearGradient id="c4d-grad-theme" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd580"/>
+      <stop offset="50%" stop-color="#f5a623"/>
+      <stop offset="51%" stop-color="#3d4452"/>
+      <stop offset="100%" stop-color="#20232b"/>
+    </linearGradient>
+    <linearGradient id="c4d-grad-cardback" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f27d49"/>
+      <stop offset="100%" stop-color="#b84518"/>
+    </linearGradient>
+    <radialGradient id="c4d-grad-pencil" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#9ce6b8"/>
+      <stop offset="70%" stop-color="#2e9960"/>
+      <stop offset="100%" stop-color="#165935"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<header>
+  <div class="brand">
+    <img src="assets/icons/vocab.png" class="c4d-png-icon" alt="词来" onerror="this.style.display='none'">
+    <span>词来</span>
+    <span class="brand-badge">课堂生词 & 闪卡</span>
+  </div>
+
+  <div class="session-bar">
+    <!-- 1. 学生与日期 -->
+    <div class="session-info" title="当前课程学生与日期">
+      <img src="assets/icons/student.png" class="c4d-png-icon" alt="学生" onerror="this.style.display='none'">
+      <input type="text" id="studentName" class="student-name" value="Alex" title="点击修改学生名字">
+      <span style="color:var(--line-dark);font-size:11px;">/</span>
+      <input type="text" id="lessonDate" class="lesson-date" value="" title="课程日期">
+    </div>
+
+    <!-- 2. 第二外语 / 母语二翻切换 (洲际排列 + 搜索 + 收藏) -->
+    <div class="session-info" style="border-color:var(--primary); background:var(--primary-light);" title="英文为必备，在此切换学生母语">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <rect x="5" y="7" width="24" height="18" rx="9" fill="url(#c4d-grad-bubble1)"/>
+        <path d="M11 23 L8 28 L15 24 Z" fill="url(#c4d-grad-bubble1)"/>
+        <rect x="18" y="18" width="25" height="19" rx="9.5" fill="url(#c4d-grad-bubble2)"/>
+        <path d="M37 35 L40 40 L32 36 Z" fill="url(#c4d-grad-bubble2)"/>
+        <circle cx="26" cy="27.5" r="1.6" fill="#fff"/>
+        <circle cx="31" cy="27.5" r="1.6" fill="#fff"/>
+        <circle cx="36" cy="27.5" r="1.6" fill="#fff"/>
+      </svg>
+      <span class="session-info-label">二翻:</span>
+      <!-- 隐藏原生 select 保持全应用与存储兼容 -->
+      <select id="targetLangSelect" style="display:none;"></select>
+      
+      <div class="lang-picker-wrapper" id="langPickerWrapper">
+        <button type="button" class="lang-picker-trigger" id="langPickerTrigger" title="点击选择或搜索二外语种">
+          <span id="langPickerCurrentLabel">ES 西班牙语</span>
+          <span class="arrow-down">▼</span>
+        </button>
+        <div class="lang-picker-dropdown" id="langPickerDropdown">
+          <div class="lang-picker-header">
+            <div class="lang-search-box">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="langSearchInput" placeholder="搜索语种、中文、代码 (如 西/es/ru/fr)..." autocomplete="off">
+            </div>
+            <div class="lang-picker-tabs" id="langPickerTabs">
+              <button type="button" class="lang-picker-tab-btn active" data-tab="all">全部</button>
+              <button type="button" class="lang-picker-tab-btn" data-tab="fav">⭐ 常用收藏</button>
+              <button type="button" class="lang-picker-tab-btn" data-tab="europe">欧洲</button>
+              <button type="button" class="lang-picker-tab-btn" data-tab="asia">亚洲/中东</button>
+              <button type="button" class="lang-picker-tab-btn" data-tab="americas">美洲</button>
+              <button type="button" class="lang-picker-tab-btn" data-tab="africa">非洲</button>
+            </div>
+          </div>
+          <div class="lang-picker-body" id="langPickerBody">
+            <!-- 动态渲染洲际语种与收藏 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 翻译/例句引擎切换 -->
+    <div class="session-info" title="切换 AI 与翻译引擎">
+      <img src="assets/icons/ai.png" class="c4d-png-icon" alt="引擎" onerror="this.style.display='none'">
+      <span class="session-info-label">引擎:</span>
+      <select id="engineSelect">
+        <option value="qwen">通义千问 (极速直连)</option>
+        <option value="google_v3">Google Cloud Translation</option>
+        <option value="gemini">Google Gemini (多语言)</option>
+        <option value="offline">纯离线词库 (19.8万词)</option>
+      </select>
+    </div>
+
+    <!-- 4. 神经网络超拟人语音音色选择 -->
+    <div class="session-info" style="border-color:var(--accent); background:var(--accent-light);" title="切换超拟人大模型发音音色">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+        <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+        <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+      </svg>
+      <span class="session-info-label">音色:</span>
+      <select id="voiceSelect">
+        <option value="zh_female_shuangkuaisisi_uranus_bigtts">爽快思思 (字正腔圆)</option>
+        <option value="zh_female_vv_uranus_bigtts">Vivi (自然日常)</option>
+        <option value="zh_male_m191_uranus_bigtts">云舟 (温和青年)</option>
+        <option value="zh-CN-XiaoxiaoNeural">微软晓晓 (播音女声)</option>
+        <option value="zh-CN-YunxiNeural">微软云希 (阳光男声)</option>
+        <option value="browser">系统本地语音 (离线)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <!-- 3D 昼夜模式球 -->
+    <button class="btn btn-secondary btn-sm" id="btnThemeToggle" title="切换深色/浅色模式">
+      <svg class="c4d-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="13" fill="url(#c4d-grad-theme)"/>
+        <path d="M16 3 A13 13 0 0 1 16 29 Z" fill="#ffffff" opacity="0.25"/>
+      </svg>
+    </button>
+    <!-- 3D 技巧灯泡 -->
+    <button class="btn btn-secondary btn-sm" id="btnHelp" title="查看使用技巧">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <path d="M24 6 C15 6, 9 12.5, 9 20 C9 25, 13 29, 16 33 L16 36 C16 37.5, 17.5 39, 19 39 L29 39 C30.5 39, 32 37.5, 32 36 L32 33 C35 29, 39 25, 39 20 C39 12.5, 33 6, 24 6 Z" fill="url(#c4d-grad-bulb)"/>
+        <rect x="17" y="39" width="14" height="4" rx="2" fill="#88929e"/>
+      </svg>
+      <span>技巧</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- 左侧：查词与当前卡片 -->
+  <section class="desk-col">
+    <!-- 查词卡 -->
+    <div class="search-card">
+      <div class="search-bar-wrap">
+        <input type="text" id="wordInput" class="search-input" placeholder="输入生词，按 Enter 立即查询 (快捷键: /)..." autofocus autocomplete="off">
+        <div class="search-btn-inside">
+          <button class="btn btn-primary" id="btnSearch">查询</button>
+        </div>
+      </div>
+      <div class="quick-tags">
+        <span>高频速点：</span>
+        <span class="tag-chip" onclick="quickLookup('顺便')">顺便</span>
+        <span class="tag-chip" onclick="quickLookup('收拾')">收拾</span>
+        <span class="tag-chip" onclick="quickLookup('尴尬')">尴尬</span>
+        <span class="tag-chip" onclick="quickLookup('马马虎虎')">马马虎虎</span>
+        <span class="tag-chip" onclick="quickLookup('甚至')">甚至</span>
+        <span class="tag-chip" onclick="quickLookup('不得不')">不得不</span>
+        <span class="tag-chip" onclick="quickLookup('打退堂鼓')">打退堂鼓</span>
+      </div>
+    </div>
+
+    <!-- 当前生词详情卡片 -->
+    <div class="card-box" id="activeCardBox">
+      <div class="card-header">
+        <div class="word-title-area">
+          <span class="word-hanzi" id="displayHanzi" title="点击发音">顺便</span>
+          <button class="audio-btn" id="btnAudioWord" title="朗读生词">
+            <svg class="c4d-icon-lg" viewBox="0 0 48 48" fill="none">
+              <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+              <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+              <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+              <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <span class="word-pinyin" id="displayPinyin">shùn biàn</span>
+          <span class="word-badge" id="displayHsk">HSK 4</span>
+        </div>
+        <div class="header-status" id="serverStatusTag" style="font-size:12px; color:var(--accent);">● 服务已就绪</div>
+      </div>
+
+      <div class="card-body">
+        <!-- 释义区：英文必备 + 母语二翻 -->
+        <div class="defs-row">
+          <div class="field-group">
+            <div class="field-label">
+              <span>英文释义 (English)</span>
+              <span class="field-tag-badge tag-en">必备</span>
+            </div>
+            <input type="text" id="displayEnglish" class="editable-field" value="conveniently; in passing; by the way">
+          </div>
+
+          <div class="field-group" id="groupNativeDef">
+            <div class="field-label">
+              <span id="labelNativeDef">母语释义 (二翻)</span>
+              <span class="field-tag-badge tag-native">二翻</span>
+            </div>
+            <input type="text" id="displayNativeDef" class="editable-field" value="de paso; ya de paso">
+          </div>
+        </div>
+
+        <!-- 例句区：支持情境指定、排除旧句与历史回溯 -->
+        <div class="field-group">
+          <div class="field-label">
+            <span>课堂实用生活例句</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button class="btn btn-secondary btn-sm" id="btnAiRegen" title="重新生成或换一个完全不同的例句">
+                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+                  <path d="M22 4 C22 14, 14 22, 4 22 C14 22, 22 30, 22 40 C22 30, 30 22, 40 22 C30 22, 22 14, 22 4 Z" fill="url(#c4d-grad-spark)"/>
+                </svg>
+                <span>换例句</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sentence-box">
+            <!-- 场景快捷切换条与前后回溯 -->
+            <div class="sent-header-row">
+              <div class="scenario-bar">
+                <span style="font-size:11.5px;color:var(--ink-dim)">语境:</span>
+                <span class="scenario-chip active" data-sc="" onclick="selectScenario('')">全场景轮换</span>
+                <span class="scenario-chip" data-sc="日常起居" onclick="selectScenario('日常起居')">日常起居</span>
+                <span class="scenario-chip" data-sc="职场工作" onclick="selectScenario('职场工作')">职场工作</span>
+                <span class="scenario-chip" data-sc="购物超市" onclick="selectScenario('购物超市')">购物超市</span>
+                <span class="scenario-chip" data-sc="餐饮聚会" onclick="selectScenario('餐饮聚会')">餐饮聚会</span>
+                <span class="scenario-chip" data-sc="交通出行" onclick="selectScenario('交通出行')">交通出行</span>
+              </div>
+
+              <!-- 上一句/下一句回溯 -->
+              <div class="history-stepper" id="historyStepper" style="display:none;">
+                <button class="step-btn" id="btnPrevSentence" title="上一句">‹</button>
+                <span id="sentHistoryIndex">1/1</span>
+                <button class="step-btn" id="btnNextSentence" title="下一句">›</button>
+              </div>
+            </div>
+
+            <div class="sent-zh">
+              <input type="text" id="displaySentZh" class="editable-field" style="flex:1;font-weight:600;font-size:16.5px;" value="你去超市的时候，能顺便帮我买瓶牛奶吗？">
+              <button class="audio-btn" id="btnAudioSent" title="朗读例句">
+                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+                  <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+                  <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+                  <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="sent-py">
+              <input type="text" id="displaySentPy" class="editable-field" style="font-size:13px;" value="Nǐ qù chāoshì de shíhou, néng shùnbiàn bāng wǒ mǎi píng niúnǎi ma?">
+            </div>
+            <div class="sent-en-row">
+              <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
+              <input type="text" id="displaySentEn" class="editable-field" style="flex:1;font-size:13.5px;" value="When you go to the supermarket, could you buy a bottle of milk for me by the way?">
+            </div>
+            <div class="sent-native-row" id="rowSentNative">
+              <span class="field-tag-badge tag-native" id="tagSentNative" style="flex-shrink:0;">二翻</span>
+              <input type="text" id="displaySentNative" class="editable-field" style="flex:1;font-size:13.5px;" value="¿Cuando vayas al supermercado, puedes traerme una botella de leche de paso?">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button class="copy-btn-primary" id="btnCopyFull" title="一键复制双语对照格式 (快捷键: Cmd+C)">
+            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
+              <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
+              <rect x="15" y="22" width="18" height="2.5" rx="1.2" fill="#e8c3b0"/>
+              <rect x="15" y="27.5" width="14" height="2.5" rx="1.2" fill="#e8c3b0"/>
+              <rect x="17" y="5" width="14" height="8" rx="4" fill="#ffdf73"/>
+            </svg>
+            <span>一键复制生词卡</span>
+            <span class="kbd-hint">⌘C</span>
+          </button>
+          <button class="collect-btn" id="btnCollect" title="收藏到生词本 (快捷键: Cmd+S)">
+            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+              <path d="M24 4 C24.8 4, 25.5 4.5, 25.9 5.3 L30.5 14.8 C30.8 15.4, 31.4 15.9, 32.1 16 L42.5 17.5 C43.4 17.6, 44.2 18.3, 44.4 19.2 C44.6 20.1, 44.2 21, 43.5 21.6 L36 29 C35.5 29.5, 35.3 30.2, 35.4 30.9 L37.2 41.2 C37.4 42.1, 37 43, 36.3 43.5 C35.5 44, 34.6 44, 33.8 43.5 L24.6 38.6 C24 38.3, 23.3 38.3, 22.7 38.6 L13.5 43.5 C12.7 44, 11.8 44, 11 43.5 C10.3 43, 9.9 42.1, 10.1 41.2 L11.9 30.9 C12 30.2, 11.8 29.5, 11.3 29 L3.8 21.6 C3.1 21, 2.7 20.1, 2.9 19.2 C3.1 18.3, 3.9 17.6, 4.8 17.5 L15.2 16 C15.9 15.9, 16.5 15.4, 16.8 14.8 L21.4 5.3 C21.8 4.5, 22.5 4, 23.3 4 Z" fill="url(#c4d-grad-star)"/>
+            </svg>
+            <span id="btnCollectText">收藏到生词本</span>
+            <span class="kbd-hint">⌘S</span>
+          </button>
+        </div>
+
+        <div class="copy-presets">
+          <span style="font-size:12px;color:var(--ink-dim)">快捷复制:</span>
+          <button class="copy-chip" id="btnCopyMinimal">精简版</button>
+          <button class="copy-chip" id="btnCopySentence">仅例句</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右侧：今日生词本 -->
+  <aside class="list-col">
+    <div class="list-panel">
+      <div class="list-header">
+        <div class="list-title">
+          <img src="assets/icons/vocab.png" class="c4d-png-icon" alt="生词本" onerror="this.style.display='none'">
+          <span>今日课堂生词</span>
+          <span class="list-count-badge" id="vocabCount">0</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-secondary btn-sm" id="btnClearList" title="清空当前列表">清空</button>
+        </div>
+      </div>
+
+      <div class="list-body" id="vocabListContainer">
+        <div class="empty-tip" id="emptyTip">
+          暂无收藏生词<br>
+          在左侧查词后，点击<b>「收藏到生词本」</b><br>
+          下课后点击下方一键生成学生复习闪卡！
+        </div>
+      </div>
+
+      <div class="list-footer">
+        <!-- AI 一键生成练习按钮 -->
+        <button class="btn btn-accent" id="btnOpenExerciseModal" style="padding:10px;font-weight:600;">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" fill="url(#c4d-grad-pencil)"/>
+            <path d="M16 32 L32 16 M28 12 L36 20" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <span>AI 一键生成随堂练习</span>
+        </button>
+
+        <!-- 课后生成闪卡按钮 -->
+        <button class="generate-card-btn" id="btnOpenExportModal">
+          <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡" onerror="this.style.display='none'">
+          <span>下课后一键生成闪卡</span>
+        </button>
+
+        <button class="btn btn-secondary" id="btnCopySummary">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
+            <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
+            <rect x="15" y="22" width="18" height="2.5" rx="1.2" fill="#e8c3b0"/>
+          </svg>
+          <span>复制整节课总结</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- 模态框 1：随堂练习生成中心 -->
+<div class="modal-overlay" id="exerciseModal">
+  <div class="modal-window" style="max-width:720px;">
+    <div class="modal-header">
+      <h3>
+        <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:24px;height:24px;">
+          <circle cx="24" cy="24" r="20" fill="url(#c4d-grad-pencil)"/>
+          <path d="M16 32 L32 16 M28 12 L36 20" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span>AI 随堂操练练习题</span>
+        <span class="brand-badge" id="exerciseCountBadge" style="background:#e8f3ee;color:var(--accent);">智能生成</span>
+      </h3>
+      <button class="btn btn-secondary btn-sm" id="btnCloseExerciseModal" style="padding:4px 8px;border-radius:50%;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1 L11 11 M11 1 L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="exerciseLoadingTip" style="text-align:center;padding:30px;color:var(--ink-dim);display:none;">
+        正在根据今日课堂生词生成实用操练题，请稍候...
+      </div>
+      <div id="exerciseListContainer" style="display:flex;flex-direction:column;gap:14px;"></div>
+    </div>
+    <div class="modal-header" style="background:var(--panel-alt);border-top:1px solid var(--line);border-bottom:none;padding:12px 20px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="btnCopyExercisesStudent">
+          <span>📋 复制做题版 (发学生做题)</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnCopyExercisesFull">
+          <span>📋 复制题目+解析 (备课版)</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnToggleAnswers">
+          <span>显示/隐藏参考答案</span>
+        </button>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btnRegenExercises">
+        <span>🔄 重新出一套</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 模态框 2：课后复习导出中心 -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3>
+        <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡">
+        <span>课后闪卡与复习资料导出中心</span>
+      </h3>
+      <button class="btn btn-secondary btn-sm" id="btnCloseModal" style="padding:4px 8px;border-radius:50%;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1 L11 11 M11 1 L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="export-option-card">
+        <div class="export-option-info">
+          <div class="export-option-title">
+            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="14" y="6" width="28" height="34" rx="7" fill="url(#c4d-grad-cardback)" transform="rotate(10 28 23)"/>
+              <rect x="7" y="8" width="28" height="34" rx="7" fill="#ffffff" stroke="#e3dcd3" stroke-width="1.5"/>
+              <circle cx="21" cy="21" r="3.5" fill="#c25220"/>
+            </svg>
+            <span>导出学生专属互动复习网页 (.html)</span>
+          </div>
+          <div class="export-option-desc">生成单文件离线网页（包含英文必备与母语二翻双语对照，内置互动随堂练习题），学生双击即可玩 3D 翻牌、听发音、刷题自测！</div>
+        </div>
+        <button class="btn btn-primary" id="btnDownloadHtmlCard">一键下载网页</button>
+      </div>
+
+      <div class="export-option-card">
+        <div class="export-option-info">
+          <div class="export-option-title">
+            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
+              <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
+            </svg>
+            <span>复制课后总结消息</span>
+          </div>
+          <div class="export-option-desc">格式化整节课生词与例句（英文+二翻对照），排版整洁，直接在聊天窗口中粘贴发送。</div>
+        </div>
+        <button class="btn btn-secondary" id="btnCopySummaryMessage">一键复制消息</button>
+      </div>
+
+      <div class="export-option-card">
+        <div class="export-option-info">
+          <div class="export-option-title">
+            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+              <path d="M10 32 L10 40 L38 40 L38 32" stroke="#c25220" stroke-width="4" stroke-linecap="round"/>
+              <path d="M24 8 L24 28 M16 20 L24 28 L32 20" stroke="#c25220" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>导出 Anki / Quizlet 格式 (CSV)</span>
+          </div>
+          <div class="export-option-desc">标准制表符分隔格式，包含中英与母语多维度字段，方便学生导入 Anki。</div>
+        </div>
+        <button class="btn btn-secondary" id="btnExportCsv">导出 CSV</button>
+      </div>
+
+      <div class="field-group" style="margin-top:6px;">
+        <div class="field-label">课后总结消息预览：</div>
+        <div class="preview-text-box" id="summaryPreviewText"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">已复制到剪贴板，可直接粘贴！</div>
+
+<!-- 引用离线全量词库 -->
+<script src="dict_data.js"></script>
+
+<script>
+/* ================= 全局状态与初始化 ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+if (window.electronAPI || (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('electron'))) {
+  document.body.classList.add('is-electron');
+}
+
+const now = new Date();
+const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+$('#lessonDate').value = todayStr;
+
+const getStorageKey = () => `cilai_vocab_${$('#studentName').value.trim() || 'default'}_${$('#lessonDate').value.trim() || todayStr}`;
+const getStudentLangKey = () => `cilai_student_lang_${$('#studentName').value.trim() || 'default'}`;
+
+let currentVocabList = [];
+let currentExercises = [];
+let currentSelectedScenario = "";
+
+// 每个生词的例句历史记录池：word -> [ { sentence_zh, sentence_py, sentence_en, sentence_native, scenario } ]
+let wordSentenceHistory = {};
+let currentHistoryIndex = 0;
+
+let currentActiveWord = {
+  word: "顺便",
+  pinyin: "shùn biàn",
+  english: "conveniently; in passing; by the way",
+  native_def: "de paso; ya de paso",
+  hsk: 4,
+  sentence_zh: "你去超市的时候，能顺便帮我买瓶牛奶吗？",
+  sentence_py: "Nǐ qù chāoshì de shíhou, néng shùnbiàn bāng wǒ mǎi píng niúnǎi ma?",
+  sentence_en: "When you go to the supermarket, could you buy a bottle of milk for me by the way?",
+  sentence_native: "¿Cuando vayas al supermercado, puedes traerme una botella de leche de paso?"
+};
+
+let isServerOnline = false;
+
+// 检查本地伴侣服务
+async function checkServer() {
+  try {
+    const res = await fetch("http://127.0.0.1:8765/api/status");
+    const data = await res.json();
+    if (data && data.ok) {
+      isServerOnline = true;
+      $('#serverStatusTag').innerHTML = `● 服务已就绪 (${data.has_dashscope ? 'Qwen✓ ' : ''}${data.has_gemini ? 'Gemini✓' : ''})`;
+      $('#serverStatusTag').style.color = "var(--accent)";
+    }
+  } catch (e) {
+    isServerOnline = false;
+    $('#serverStatusTag').innerHTML = "● 纯离线模式 (19.8万词库就绪)";
+    $('#serverStatusTag').style.color = "var(--ink-soft)";
+  }
+}
+
+
+/* ================= 洲际语言库数据与检索系统 ================= */
+const CONTINENT_LANG_DATA = [
+  {
+    continentId: "special",
+    continentTitle: "基础默认",
+    langs: [
+      { name: "英语", code: "EN", native: "English only", label: "仅英文 (English only)", searchKey: "英语 yingyu en english" }
+    ]
+  },
+  {
+    continentId: "europe",
+    continentTitle: "欧洲语言 (Europe)",
+    langs: [
+      { name: "西班牙语", code: "ES", native: "Español", label: "ES 西班牙语 (Español)", searchKey: "西班牙语 xibanyayu es spanish espanol" },
+      { name: "俄语", code: "RU", native: "Русский", label: "RU 俄语 (Русский)", searchKey: "俄语 eyu ru russian russkiy" },
+      { name: "法语", code: "FR", native: "Français", label: "FR 法语 (Français)", searchKey: "法语 fayu fr french francais" },
+      { name: "德语", code: "DE", native: "Deutsch", label: "DE 德语 (Deutsch)", searchKey: "德语 deyu de german deutsch" },
+      { name: "意大利语", code: "IT", native: "Italiano", label: "IT 意大利语 (Italiano)", searchKey: "意大利语 yidaliyu it italian italiano" },
+      { name: "葡萄牙语", code: "PT", native: "Português", label: "PT 葡萄牙语 (Português)", searchKey: "葡萄牙语 putaoyayu pt portuguese portugues" },
+      { name: "荷兰语", code: "NL", native: "Nederlands", label: "NL 荷兰语 (Nederlands)", searchKey: "荷兰语 helanyu nl dutch nederlands" },
+      { name: "波兰语", code: "PL", native: "Polski", label: "PL 波兰语 (Polski)", searchKey: "波兰语 bolanyu pl polish polski" },
+      { name: "乌克兰语", code: "UK", native: "Українська", label: "UK 乌克兰语 (Українська)", searchKey: "乌克兰语 wukelan uk ukrainian" },
+      { name: "希腊语", code: "EL", native: "Ελληνικά", label: "EL 希腊语 (Ελληνικά)", searchKey: "希腊语 xilayu el greek" },
+      { name: "捷克语", code: "CS", native: "Čeština", label: "CS 捷克语 (Čeština)", searchKey: "捷克语 jiekeyu cs czech cestina" },
+      { name: "瑞典语", code: "SV", native: "Svenska", label: "SV 瑞典语 (Svenska)", searchKey: "瑞典语 ruidianyu sv swedish svenska" },
+      { name: "匈牙利语", code: "HU", native: "Magyar", label: "HU 匈牙利语 (Magyar)", searchKey: "匈牙利语 xiongyali hu hungarian magyar" },
+      { name: "罗马尼亚语", code: "RO", native: "Română", label: "RO 罗马尼亚语 (Română)", searchKey: "罗马尼亚语 luomaniya ro romanian romana" },
+      { name: "丹麦语", code: "DA", native: "Dansk", label: "DA 丹麦语 (Dansk)", searchKey: "丹麦语 danmaiyu da danish dansk" },
+      { name: "芬兰语", code: "FI", native: "Suomi", label: "FI 芬兰语 (Suomi)", searchKey: "芬兰语 fenlanyu fi finnish suomi" },
+      { name: "挪威语", code: "NO", native: "Norsk", label: "NO 挪威语 (Norsk)", searchKey: "挪威语 nuoweiyu no norwegian norsk" },
+      { name: "塞尔维亚语", code: "SR", native: "Српски", label: "SR 塞尔维亚语 (Српски)", searchKey: "塞尔维亚语 saierweiya sr serbian" },
+      { name: "克罗地亚语", code: "HR", native: "Hrvatski", label: "HR 克罗地亚语 (Hrvatski)", searchKey: "克罗地亚语 keluodiya hr croatian hrvatski" },
+      { name: "斯洛伐克语", code: "SK", native: "Slovenčina", label: "SK 斯洛伐克语 (Slovenčina)", searchKey: "斯洛伐克语 siluofake sk slovak" },
+      { name: "保加利亚语", code: "BG", native: "Български", label: "BG 保加利亚语 (Български)", searchKey: "保加利亚语 baojialiya bg bulgarian" },
+      { name: "立陶宛语", code: "LT", native: "Lietuvių", label: "LT 立陶宛语 (Lietuvių)", searchKey: "立陶宛语 litaowan lt lithuanian" },
+      { name: "拉脱维亚语", code: "LV", native: "Latviešu", label: "LV 拉脱维亚语 (Latviešu)", searchKey: "拉脱维亚语 latuoweiya lv latvian" },
+      { name: "爱沙尼亚语", code: "ET", native: "Eesti", label: "ET 爱沙尼亚语 (Eesti)", searchKey: "爱沙尼亚语 aishaniya et estonian eesti" },
+      { name: "斯洛文尼亚语", code: "SL", native: "Slovenščina", label: "SL 斯洛文尼亚语 (Slovenščina)", searchKey: "斯洛文尼亚语 siluowenniya sl slovenian" },
+      { name: "爱尔兰语", code: "GA", native: "Gaeilge", label: "GA 爱尔兰语 (Gaeilge)", searchKey: "爱尔兰语 aierlanyu ga irish gaeilge" }
+    ]
+  },
+  {
+    continentId: "asia",
+    continentTitle: "亚洲与中东 (Asia & Middle East)",
+    langs: [
+      { name: "日语", code: "JA", native: "日本語", label: "JA 日语 (日本語)", searchKey: "日语 riyu ja japanese nihongo" },
+      { name: "韩语", code: "KO", native: "한국어", label: "KO 韩语 (한국어)", searchKey: "韩语 hanyu ko korean hangugeo" },
+      { name: "越南语", code: "VI", native: "Tiếng Việt", label: "VI 越南语 (Tiếng Việt)", searchKey: "越南语 yuenanyu vi vietnamese tieng viet" },
+      { name: "泰语", code: "TH", native: "ภาษาไทย", label: "TH 泰语 (ภาษาไทย)", searchKey: "泰语 taiyu th thai" },
+      { name: "印度尼西亚语", code: "ID", native: "Bahasa Indonesia", label: "ID 印尼语 (Bahasa Indonesia)", searchKey: "印度尼西亚语 印尼语 yinni id indonesian" },
+      { name: "马来语", code: "MS", native: "Bahasa Melayu", label: "MS 马来语 (Bahasa Melayu)", searchKey: "马来语 malaiyu ms malay" },
+      { name: "阿拉伯语", code: "AR", native: "العربية", label: "AR 阿拉伯语 (العربية)", searchKey: "阿拉伯语 alaboyu ar arabic" },
+      { name: "土耳其语", code: "TR", native: "Türkçe", label: "TR 土耳其语 (Türkçe)", searchKey: "土耳其语 tuerqiyu tr turkish turkce" },
+      { name: "波斯语", code: "FA", native: "فارسی", label: "FA 波斯语 (فارسی)", searchKey: "波斯语 bosiyu fa persian farsi" },
+      { name: "希伯来语", code: "HE", native: "עברית", label: "HE 希伯来语 (עברית)", searchKey: "希伯来语 xibolai he hebrew ivrit" },
+      { name: "印地语", code: "HI", native: "हिन्दी", label: "HI 印地语 (हिन्दी)", searchKey: "印地语 yindiyu hi hindi" },
+      { name: "孟加拉语", code: "BN", native: "বাংলা", label: "BN 孟加拉语 (বাংলা)", searchKey: "孟加拉语 mengjiala bn bengali bangla" },
+      { name: "乌尔都语", code: "UR", native: "اردو", label: "UR 乌尔都语 (اردو)", searchKey: "乌尔都语 wuerdu ur urdu" },
+      { name: "菲律宾语", code: "TL", native: "Tagalog", label: "TL 菲律宾语 (Tagalog)", searchKey: "菲律宾语 feilubin tl tagalog filipino" },
+      { name: "缅甸语", code: "MY", native: "မြန်မာစာ", label: "MY 缅甸语 (မြန်မာစာ)", searchKey: "缅甸语 miandianyu my burmese myanmar" },
+      { name: "高棉语", code: "KM", native: "ភាសាខ្មែរ", label: "KM 柬埔寨高棉语 (ភាសាខ្មែរ)", searchKey: "柬埔寨 高棉语 jianpuzhai gaomian km khmer" },
+      { name: "老挝语", code: "LO", native: "ພາສາລາວ", label: "LO 老挝语 (ພາສາລາວ)", searchKey: "老挝语 laowoyu lo lao" },
+      { name: "蒙古语", code: "MN", native: "Монгол хэл", label: "MN 蒙古语 (Монгол хэл)", searchKey: "蒙古语 mengguyu mn mongolian" },
+      { name: "哈萨克语", code: "KK", native: "Қазақ тілі", label: "KK 哈萨克语 (Қазақ тілі)", searchKey: "哈萨克语 hasake kk kazakh" },
+      { name: "乌兹别克语", code: "UZ", native: "Oʻzbekcha", label: "UZ 乌兹别克语 (Oʻzbekcha)", searchKey: "乌兹别克语 wuzibieke uz uzbek" },
+      { name: "格鲁吉亚语", code: "KA", native: "ქართული", label: "KA 格鲁吉亚语 (ქართული)", searchKey: "格鲁吉亚语 gelujiya ka georgian" },
+      { name: "亚美尼亚语", code: "HY", native: "Հայերեն", label: "HY 亚美尼亚语 (Հայերեն)", searchKey: "亚美尼亚语 yameiniya hy armenian" },
+      { name: "阿塞拜疆语", code: "AZ", native: "Azərbaycan", label: "AZ 阿塞拜疆语 (Azərbaycan)", searchKey: "阿塞拜疆语 asaibaijiang az azerbaijani" },
+      { name: "泰米尔语", code: "TA", native: "தமிழ்", label: "TA 泰米尔语 (தமிழ்)", searchKey: "泰米尔语 taimier ta tamil" },
+      { name: "泰卢固语", code: "TE", native: "తెలుగు", label: "TE 泰卢固语 (తెలుగు)", searchKey: "泰卢固语 tailugu te telugu" }
+    ]
+  },
+  {
+    continentId: "americas",
+    continentTitle: "美洲语言 (Americas)",
+    langs: [
+      { name: "拉美西班牙语", code: "ES-419", native: "Español Latino", label: "ES-419 拉美西语 (Latino)", searchKey: "拉美西班牙语 lamei spanish latino es" },
+      { name: "巴西葡萄牙语", code: "PT-BR", native: "Português do Brasil", label: "PT-BR 巴西葡语 (Brasil)", searchKey: "巴西葡萄牙语 baxi brazilian portuguese pt" },
+      { name: "加拿大法语", code: "FR-CA", native: "Français Canadien", label: "FR-CA 加拿大法语 (Canada)", searchKey: "加拿大法语 jianada canadian french fr" }
+    ]
+  },
+  {
+    continentId: "africa",
+    continentTitle: "非洲语言 (Africa)",
+    langs: [
+      { name: "斯瓦希里语", code: "SW", native: "Kiswahili", label: "SW 斯瓦希里语 (Kiswahili)", searchKey: "斯瓦希里语 siwaxili sw swahili kiswahili" },
+      { name: "南非荷兰语", code: "AF", native: "Afrikaans", label: "AF 南非荷兰语 (Afrikaans)", searchKey: "南非荷兰语 nanfei af afrikaans" },
+      { name: "阿姆哈拉语", code: "AM", native: "አማርኛ", label: "AM 阿姆哈拉语 (埃塞俄比亚)", searchKey: "阿姆哈拉语 amuhala am amharic" },
+      { name: "豪萨语", code: "HA", native: "Hausa", label: "HA 豪萨语 (西非)", searchKey: "豪萨语 haosa ha hausa" },
+      { name: "约鲁巴语", code: "YO", native: "Yorùbá", label: "YO 约鲁巴语 (西非)", searchKey: "约鲁巴语 yueluba yo yoruba" },
+      { name: "祖鲁语", code: "ZU", native: "isiZulu", label: "ZU 祖鲁语 (南非)", searchKey: "祖鲁语 zuluyu zu zulu" }
+    ]
+  }
+];
+
+// 扁平语言映射池
+const ALL_LANGS_FLAT = [];
+CONTINENT_LANG_DATA.forEach(group => {
+  group.langs.forEach(lang => {
+    ALL_LANGS_FLAT.push({
+      ...lang,
+      continentId: group.continentId,
+      continentTitle: group.continentTitle
+    });
+  });
+});
+
+const LANG_STORAGE_FAV_KEY = 'cilai_favorite_langs';
+
+function getFavoriteLangs() {
+  try {
+    const raw = localStorage.getItem(LANG_STORAGE_FAV_KEY);
+    return raw ? JSON.parse(raw) : ['西班牙语', '俄语', '法语', '德语', '日语', '韩语'];
+  } catch(e) {
+    return ['西班牙语', '俄语', '法语', '德语', '日语', '韩语'];
+  }
+}
+
+function saveFavoriteLangs(favs) {
+  try {
+    localStorage.setItem(LANG_STORAGE_FAV_KEY, JSON.stringify(favs));
+  } catch(e) {}
+}
+
+function toggleFavoriteLang(langName, e) {
+  if (e) e.stopPropagation();
+  let favs = getFavoriteLangs();
+  if (favs.includes(langName)) {
+    favs = favs.filter(l => l !== langName);
+    showToast(`已取消收藏「${langName}」`);
+  } else {
+    favs.push(langName);
+    showToast(`⭐ 已将「${langName}」加入常用收藏`);
+  }
+  saveFavoriteLangs(favs);
+  renderLangDropdownBody();
+}
+
+// 初始化原生 Select 供其他逻辑通用
+function populateNativeTargetLangSelect() {
+  const select = $('#targetLangSelect');
+  select.innerHTML = '';
+  ALL_LANGS_FLAT.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.name;
+    opt.textContent = l.label;
+    select.appendChild(opt);
+  });
+}
+
+let activeLangTab = 'all';
+
+function renderLangDropdownBody() {
+  const body = $('#langPickerBody');
+  const query = ($('#langSearchInput').value || '').trim().toLowerCase();
+  const currentLang = $('#targetLangSelect').value;
+  const favs = getFavoriteLangs();
+
+  body.innerHTML = '';
+
+  // 1. 如果选中了“⭐ 常用收藏” Tab
+  if (activeLangTab === 'fav') {
+    const favLangs = ALL_LANGS_FLAT.filter(l => favs.includes(l.name));
+    renderLangGroup(body, "⭐ 常用语种收藏", favLangs, currentLang, favs, query);
+    if (favLangs.length === 0) {
+      body.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink-dim);font-size:12px;">暂无收藏，点击列表右侧星标 ⭐ 即可收藏常用母语</div>';
+    }
+    return;
+  }
+
+  // 2. 如果有搜索词，按搜索词全局匹配
+  if (query) {
+    const matched = ALL_LANGS_FLAT.filter(l => {
+      return l.searchKey.includes(query) || l.label.toLowerCase().includes(query) || l.native.toLowerCase().includes(query);
+    });
+    if (matched.length === 0) {
+      body.innerHTML = `<div style="text-align:center;padding:24px;color:var(--ink-dim);font-size:12px;">未找到匹配 "${escapeHtml(query)}" 的语种</div>`;
+      return;
+    }
+    renderLangGroup(body, `搜索结果 (${matched.length})`, matched, currentLang, favs, query);
+    return;
+  }
+
+  // 3. 常规按洲际分组渲染
+  // 如果处于全部 Tab，顶部单独置顶“常用收藏”
+  if (activeLangTab === 'all' && favs.length > 0) {
+    const favLangs = ALL_LANGS_FLAT.filter(l => favs.includes(l.name));
+    renderLangGroup(body, "⭐ 常用收藏", favLangs, currentLang, favs);
+  }
+
+  CONTINENT_LANG_DATA.forEach(group => {
+    if (activeLangTab !== 'all' && group.continentId !== activeLangTab) {
+      return;
+    }
+    renderLangGroup(body, group.continentTitle, group.langs, currentLang, favs);
+  });
+}
+
+function renderLangGroup(container, title, langs, currentLang, favs, query = "") {
+  if (!langs || langs.length === 0) return;
+  const groupEl = document.createElement('div');
+  groupEl.className = 'lang-continent-group';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'lang-continent-title';
+  titleEl.innerHTML = `<span>${title}</span><span>${langs.length} 种</span>`;
+  groupEl.appendChild(titleEl);
+
+  langs.forEach(lang => {
+    const isSelected = (lang.name === currentLang);
+    const isFav = favs.includes(lang.name);
+
+    const row = document.createElement('div');
+    row.className = `lang-item-row ${isSelected ? 'selected' : ''}`;
+    row.onclick = () => selectLanguage(lang.name);
+
+    row.innerHTML = `
+      <div class="lang-item-left">
+        <span class="lang-code-pill">${lang.code}</span>
+        <span style="font-weight:600;">${lang.name}</span>
+        <span class="lang-item-native">(${lang.native})</span>
+      </div>
+      <div class="lang-fav-star ${isFav ? 'favorited' : ''}" title="${isFav ? '取消收藏' : '收藏到常用'}" onclick="toggleFavoriteLang('${lang.name}', event)">
+        ${isFav ? '★' : '☆'}
+      </div>
+    `;
+    groupEl.appendChild(row);
+  });
+
+  container.appendChild(groupEl);
+}
+
+function selectLanguage(langName) {
+  const select = $('#targetLangSelect');
+  select.value = langName;
+  updateLanguageDisplayButton();
+  closeLangPicker();
+
+  updateLabelsForLang();
+  saveList();
+  if (currentActiveWord && currentActiveWord.word) {
+    lookupWord(currentActiveWord.word);
+  }
+}
+
+function updateLanguageDisplayButton() {
+  const select = $('#targetLangSelect');
+  const val = select.value || "英语";
+  const found = ALL_LANGS_FLAT.find(l => l.name === val);
+  const btnLabel = $('#langPickerCurrentLabel');
+  if (found) {
+    btnLabel.textContent = (found.name === '英语') ? '仅英文 (English)' : `${found.code} ${found.name}`;
+  } else {
+    btnLabel.textContent = val;
+  }
+}
+
+function initLangPicker() {
+  populateNativeTargetLangSelect();
+  updateLanguageDisplayButton();
+
+  const trigger = $('#langPickerTrigger');
+  const dropdown = $('#langPickerDropdown');
+  const searchInput = $('#langSearchInput');
+  const tabs = $('#langPickerTabs');
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.contains('active');
+    if (isOpen) {
+      closeLangPicker();
+    } else {
+      openLangPicker();
+    }
+  });
+
+  searchInput.addEventListener('input', () => {
+    renderLangDropdownBody();
+  });
+
+  tabs.querySelectorAll('.lang-picker-tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabs.querySelectorAll('.lang-picker-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeLangTab = btn.getAttribute('data-tab');
+      renderLangDropdownBody();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!$('#langPickerWrapper').contains(e.target)) {
+      closeLangPicker();
+    }
+  });
+}
+
+function openLangPicker() {
+  const dropdown = $('#langPickerDropdown');
+  dropdown.classList.add('active');
+  $('#langSearchInput').value = '';
+  renderLangDropdownBody();
+  setTimeout(() => $('#langSearchInput').focus(), 50);
+}
+
+function closeLangPicker() {
+  $('#langPickerDropdown').classList.remove('active');
+}
+
+// 载入本地缓存生词本
+function loadSavedList() {
+  const savedLang = localStorage.getItem(getStudentLangKey());
+  if (savedLang) {
+    $('#targetLangSelect').value = savedLang;
+  }
+  updateLabelsForLang();
+  updateLanguageDisplayButton();
+
+  try {
+    const raw = localStorage.getItem(getStorageKey());
+    currentVocabList = raw ? (JSON.parse(raw) || []) : [];
+  } catch(e) {
+    currentVocabList = [];
+  }
+  renderVocabList();
+}
+
+function saveList() {
+  try {
+    localStorage.setItem(getStorageKey(), JSON.stringify(currentVocabList));
+    localStorage.setItem(getStudentLangKey(), $('#targetLangSelect').value);
+  } catch(e) {}
+
+  if (isServerOnline) {
+    fetch("http://127.0.0.1:8765/api/save_lesson", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student: $('#studentName').value.trim(),
+        date: $('#lessonDate').value.trim(),
+        target_lang: $('#targetLangSelect').value,
+        vocab: currentVocabList
+      })
+    }).catch(()=>{});
+  }
+  renderVocabList();
+}
+
+function updateLabelsForLang() {
+  const lang = $('#targetLangSelect').value;
+  const isEnglishOnly = (lang === '英语');
+
+  $('#groupNativeDef').style.display = isEnglishOnly ? 'none' : 'flex';
+  $('#rowSentNative').style.display = isEnglishOnly ? 'none' : 'flex';
+
+  if (!isEnglishOnly) {
+    $('#labelNativeDef').textContent = `母语释义 (${lang} - 二翻)`;
+    $('#tagSentNative').textContent = lang.substring(0, 2);
+  }
+}
+
+/* ================= 提示 Toast 与 复制 ================= */
+function showToast(msg) {
+  const toast = $('#toast');
+  toast.textContent = msg;
+  toast.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('on'), 1600);
+}
+
+function copyToClipboard(text, successMsg = "已复制到剪贴板，可直接粘贴！") {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(() => fallbackCopy(text, successMsg));
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+}
+
+function fallbackCopy(text, successMsg) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.cssText = "position:fixed;left:-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast(successMsg);
+  } catch (e) {
+    showToast("复制失败，请手动选中复制");
+  }
+  ta.remove();
+}
+
+/* ================= 超拟人神经网络发音 (TTS) ================= */
+let activeAudioPlayer = null;
+
+function speak(text) {
+  const cleanText = text.trim();
+  if (!cleanText) return;
+
+  const speaker = $('#voiceSelect').value;
+
+  // 如果选择系统本地离线语音
+  if (speaker === 'browser' || !isServerOnline) {
+    speakBrowser(cleanText);
+    return;
+  }
+
+  // 优先调用后台大模型超拟人 TTS 音频流
+  if (activeAudioPlayer) {
+    activeAudioPlayer.pause();
+    activeAudioPlayer = null;
+  }
+
+  const url = `http://127.0.0.1:8765/api/tts?text=${encodeURIComponent(cleanText)}&speaker=${encodeURIComponent(speaker)}`;
+  const audio = new Audio(url);
+  activeAudioPlayer = audio;
+
+  audio.play().catch(err => {
+    console.log("在线 TTS 播放降级系统语音:", err);
+    speakBrowser(cleanText);
+  });
+}
+
+function speakBrowser(text) {
+  if (!('speechSynthesis' in window)) {
+    showToast("当前环境不支持语音朗读");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.rate = 0.85;
+
+  // 寻找最佳普通话音色，避开机械 Tingting
+  const voices = window.speechSynthesis.getVoices() || [];
+  const bestVoice = voices.find(v => (v.lang === 'zh-CN' || v.lang === 'zh_CN') && !v.name.includes('Tingting') && !v.name.includes('婷婷')) 
+                 || voices.find(v => v.lang.startsWith('zh'));
+  if (bestVoice) {
+    utter.voice = bestVoice;
+  }
+
+  window.speechSynthesis.speak(utter);
+}
+
+/* ================= 查词与拼音生成 ================= */
+
+// 动态生活化多句式离线库，杜绝任何机械套话
+function getNaturalFallbackSentence(word, pinyin, english) {
+  const py = pinyin || getPinyinForText(word);
+  const def = english || "";
+
+  // 1. 动词/动作类（如：收拾、打扫、准备）
+  if (/收拾|打扫|洗|做|买|借|带|寄|拿|找|送|问|听|说|读|写|看|吃|喝/.test(word)) {
+    return {
+      zh: `房间有点儿乱，我先把东西${word}一下。`,
+      py: `Fángjiān yǒudiǎnr luàn, wǒ xiān bǎ dōngxi ${py} yíxià.`,
+      en: `The room is a bit messy, I will ${def || word} things first.`
+    };
+  }
+  // 2. 副词/关联词类（如：顺便、甚至、不得不、正好、顺手）
+  if (/顺便|顺手|甚至|不得不|正好|突然|其实|经常|已经/.test(word)) {
+    return {
+      zh: `你去超市买咖啡的时候，能${word}帮我带瓶水吗？`,
+      py: `Nǐ qù chāoshì mǎi kāfēi de shíhou, néng ${py} bāng wǒ dài píng shuǐ ma?`,
+      en: `When you go to the supermarket to buy coffee, could you ${def || word} bring me a bottle of water?`
+    };
+  }
+  // 3. 心理/成语/形容词类（如：尴尬、马马虎虎、打退堂鼓）
+  if (/尴尬|害羞|着急|高兴|难过|舒服|漂亮|容易|便宜|马马虎虎|打退堂鼓/.test(word)) {
+    return {
+      zh: `刚遇到点儿困难就想${word}，可不是个好习惯。`,
+      py: `Gāng yùdào diǎnr kùnnan jiù xiǎng ${py}, kě bú shì ge hǎo xíguàn.`,
+      en: `Wanting to ${def || word} as soon as you encounter difficulties is not a good habit.`
+    };
+  }
+  // 4. 地道口语交际通用问句
+  return {
+    zh: `在日常生活中，大家常说“${word}”是什么意思？`,
+    py: `Zài rìcháng shēnghuó zhōng, dàjiā cháng shuō "${py}" shì shénme yìsi?`,
+    en: `In daily life, what does it mean when people often say "${word}"?`
+  };
+}
+
+function getPinyinForText(str) {
+  if (!window.CHAR_PINYIN) return str;
+  let res = [];
+  for (const ch of str) {
+    res.push(window.CHAR_PINYIN[ch] || ch);
+  }
+  return res.join(" ");
+}
+
+// 查词主逻辑
+async function lookupWord(rawWord) {
+  const word = rawWord.trim();
+  if (!word) return;
+
+  const targetLang = $('#targetLangSelect').value;
+  const engine = $('#engineSelect').value;
+
+  let pinyin = "";
+  let baseEnglish = "";
+  let hsk = 0;
+  let exZh = "";
+  let exPy = "";
+  let exEn = "";
+
+  if (window.DICT_DATA && window.DICT_DATA[word]) {
+    const entry = window.DICT_DATA[word];
+    pinyin = entry[0];
+    baseEnglish = entry[1];
+    hsk = entry[2] || 0;
+  } else {
+    pinyin = getPinyinForText(word);
+    baseEnglish = "（未收录词条，可手动修改）";
+  }
+
+  if (window.CURATED_EXAMPLES && window.CURATED_EXAMPLES[word]) {
+    const ce = window.CURATED_EXAMPLES[word];
+    exZh = ce.zh;
+    exPy = ce.py;
+    exEn = ce.en;
+  } else {
+    // 彻底摒弃机械模板句，根据常见词性生成自然日常口语句
+    const naturalExamples = getNaturalFallbackSentence(word, pinyin, baseEnglish);
+    exZh = naturalExamples.zh;
+    exPy = naturalExamples.py;
+    exEn = naturalExamples.en;
+  }
+
+  currentActiveWord = {
+    word: word,
+    pinyin: pinyin,
+    english: baseEnglish,
+    native_def: (targetLang !== '英语' ? '（连网自动获取二翻）' : ''),
+    hsk: hsk,
+    sentence_zh: exZh,
+    sentence_py: exPy,
+    sentence_en: exEn,
+    sentence_native: (targetLang !== '英语' ? '（连网自动获取二翻）' : '')
+  };
+
+  // 初始化该词的历史池
+  if (!wordSentenceHistory[word]) {
+    wordSentenceHistory[word] = [];
+  }
+  if (!wordSentenceHistory[word].some(s => s.sentence_zh === exZh)) {
+    wordSentenceHistory[word].push({
+      sentence_zh: exZh,
+      sentence_py: exPy,
+      sentence_en: exEn,
+      sentence_native: currentActiveWord.sentence_native,
+      scenario: "常用默认"
+    });
+  }
+  currentHistoryIndex = wordSentenceHistory[word].length - 1;
+
+  updateCardUI();
+
+  if (isServerOnline && engine !== 'offline') {
+    requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, false);
+  }
+}
+
+// 场景切换快速触发
+function selectScenario(sc) {
+  currentSelectedScenario = sc;
+  document.querySelectorAll('.scenario-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.sc === sc);
+  });
+  // 立即触发换例句
+  triggerRegenSentence();
+}
+
+// 换例句主入口（防重复 + 场景轮换）
+function triggerRegenSentence() {
+  syncActiveWordFromUI();
+  const word = currentActiveWord.word;
+  const targetLang = $('#targetLangSelect').value;
+  const engine = $('#engineSelect').value;
+
+  if (isServerOnline && engine !== 'offline') {
+    requestAiSentence(word, currentActiveWord.pinyin, currentActiveWord.english, targetLang, engine, true);
+  } else {
+    // 离线多句式切换
+    cycleOfflineSentence();
+  }
+}
+
+// 离线丰富句式轮换（至少 5 种不同口语句型）
+function cycleOfflineSentence() {
+  const word = currentActiveWord.word;
+  const p = currentActiveWord.pinyin;
+  const templates = [
+    { zh: `你出门的时候，能（${word}）帮我带份报纸吗？`, py: `Nǐ chūmén de shíhou, néng (${p}) bāng wǒ dài fèn bàozhǐ ma?`, en: `Could you (${currentActiveWord.english}) get me a newspaper when you go out?` },
+    { zh: `我今天下班早，正好（${word}）去了一趟超市。`, py: `Wǒ jīntiān xiàbān zǎo, zhènghǎo (${p}) qù le yí tàng chāoshì.`, en: `I got off work early today and happened to go to the supermarket.` },
+    { zh: `别特意跑一趟了，等下次路过再（${word}）去吧。`, py: `Bié tèyì pǎo yí tàng le, děng xiàcì lùguò zài (${p}) qù ba.`, en: `No need to make a special trip, just go next time you pass by.` },
+    { zh: `他一边散步，一边（${word}）活动活动身体。`, py: `Tā yìbiān sànbù, yìbiān (${p}) huódòng huódòng shēntǐ.`, en: `While walking, he also stretches his body a bit.` },
+    { zh: `我们这次去北京开会，还可以（${word}）参观一下故宫。`, py: `Wǒmen zhè cì qù Běijīng kāihuì, hái kěyǐ (${p}) cānguān yíxià Gùgōng.`, en: `Going to Beijing for a meeting this time, we can also visit the Forbidden City.` }
+  ];
+
+  const nextIdx = (currentHistoryIndex + 1) % templates.length;
+  const t = templates[nextIdx];
+  currentActiveWord.sentence_zh = t.zh.replace(`（${word}）`, word);
+  currentActiveWord.sentence_py = t.py.replace(`(${p})`, p);
+  currentActiveWord.sentence_en = t.en;
+  currentActiveWord.sentence_native = t.en;
+
+  recordSentenceHistory(currentActiveWord.sentence_zh, currentActiveWord.sentence_py, currentActiveWord.sentence_en, currentActiveWord.sentence_native, "离线句式");
+  updateCardUI();
+  showToast("已切换下一个例句");
+}
+
+function recordSentenceHistory(zh, py, en, native, scenario) {
+  const word = currentActiveWord.word;
+  if (!wordSentenceHistory[word]) wordSentenceHistory[word] = [];
+  const existingIdx = wordSentenceHistory[word].findIndex(s => s.sentence_zh === zh);
+  if (existingIdx === -1) {
+    wordSentenceHistory[word].push({ sentence_zh: zh, sentence_py: py, sentence_en: en, sentence_native: native, scenario: scenario });
+    currentHistoryIndex = wordSentenceHistory[word].length - 1;
+  } else {
+    currentHistoryIndex = existingIdx;
+  }
+  updateHistoryStepperUI();
+}
+
+function updateHistoryStepperUI() {
+  const word = currentActiveWord.word;
+  const pool = wordSentenceHistory[word] || [];
+  const stepper = $('#historyStepper');
+  if (pool.length > 1) {
+    stepper.style.display = 'flex';
+    $('#sentHistoryIndex').textContent = `${currentHistoryIndex + 1}/${pool.length}`;
+  } else {
+    stepper.style.display = 'none';
+  }
+}
+
+function stepHistory(offset) {
+  const word = currentActiveWord.word;
+  const pool = wordSentenceHistory[word] || [];
+  if (pool.length <= 1) return;
+
+  currentHistoryIndex = (currentHistoryIndex + offset + pool.length) % pool.length;
+  const item = pool[currentHistoryIndex];
+  currentActiveWord.sentence_zh = item.sentence_zh;
+  currentActiveWord.sentence_py = item.sentence_py;
+  currentActiveWord.sentence_en = item.sentence_en;
+  currentActiveWord.sentence_native = item.sentence_native;
+  updateCardUI();
+  showToast(`已调出第 ${currentHistoryIndex + 1} 句（${item.scenario || '历史'}）`);
+}
+
+// 请求 AI 换例句（携带已有句避重列表与指定语境）
+async function requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, isRegen = false) {
+  try {
+    $('#btnAiRegen').querySelector('span').textContent = "生成中...";
+
+    // 提取所有已经生成过的例句，传给后端绝对排重
+    const pool = wordSentenceHistory[word] || [];
+    const avoidList = pool.map(s => s.sentence_zh).filter(Boolean);
+
+    const res = await fetch("http://127.0.0.1:8765/api/generate_sentence", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        word,
+        pinyin,
+        english: baseEnglish,
+        target_lang: targetLang,
+        engine: engine,
+        avoid_sentences: avoidList,
+        scenario: currentSelectedScenario
+      })
+    });
+    const data = await res.json();
+    if (data && data.ok && data.data) {
+      if (data.data.english) currentActiveWord.english = data.data.english;
+      if (data.data.native_def) currentActiveWord.native_def = data.data.native_def;
+      if (data.data.sentence_zh) currentActiveWord.sentence_zh = data.data.sentence_zh;
+      if (data.data.sentence_py) currentActiveWord.sentence_py = data.data.sentence_py;
+      if (data.data.sentence_en) currentActiveWord.sentence_en = data.data.sentence_en;
+      if (data.data.sentence_native) currentActiveWord.sentence_native = data.data.sentence_native;
+
+      recordSentenceHistory(
+        currentActiveWord.sentence_zh,
+        currentActiveWord.sentence_py,
+        currentActiveWord.sentence_en,
+        currentActiveWord.sentence_native,
+        currentSelectedScenario || "综合"
+      );
+
+      updateCardUI();
+      showToast(isRegen ? `已换新例句（${currentSelectedScenario || '全新语境'}）` : `已生成双语词条`);
+    }
+  } catch (e) {
+    if (isRegen) cycleOfflineSentence();
+  } finally {
+    $('#btnAiRegen').querySelector('span').textContent = "换例句";
+  }
+}
+
+function updateCardUI() {
+  $('#displayHanzi').textContent = currentActiveWord.word;
+  $('#displayPinyin').textContent = currentActiveWord.pinyin;
+  $('#displayEnglish').value = currentActiveWord.english;
+  $('#displayNativeDef').value = currentActiveWord.native_def || '';
+  $('#displayHsk').textContent = currentActiveWord.hsk ? `HSK ${currentActiveWord.hsk}` : '拓展词';
+  $('#displaySentZh').value = currentActiveWord.sentence_zh;
+  $('#displaySentPy').value = currentActiveWord.sentence_py;
+  $('#displaySentEn').value = currentActiveWord.sentence_en;
+  $('#displaySentNative').value = currentActiveWord.sentence_native || '';
+
+  const isCollected = currentVocabList.some(item => item.word === currentActiveWord.word);
+  $('#btnCollect').classList.toggle('collected', isCollected);
+  $('#btnCollectText').textContent = isCollected ? "已在生词本" : "收藏到生词本";
+
+  updateHistoryStepperUI();
+}
+
+function syncActiveWordFromUI() {
+  currentActiveWord.english = $('#displayEnglish').value.trim();
+  currentActiveWord.native_def = $('#displayNativeDef').value.trim();
+  currentActiveWord.sentence_zh = $('#displaySentZh').value.trim();
+  currentActiveWord.sentence_py = $('#displaySentPy').value.trim();
+  currentActiveWord.sentence_en = $('#displaySentEn').value.trim();
+  currentActiveWord.sentence_native = $('#displaySentNative').value.trim();
+}
+
+function quickLookup(w) {
+  $('#wordInput').value = w;
+  lookupWord(w);
+}
+
+/* ================= 复制格式生成 (英文必备 + 母语二翻) ================= */
+function getFormattedFull(item) {
+  const lang = $('#targetLangSelect').value;
+  const hasSecond = (lang !== '英语' && item.native_def);
+
+  if (hasSecond) {
+    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${lang.substring(0,2).toUpperCase()}: ${item.native_def}\n例句：${item.sentence_zh}\nEN: ${item.sentence_en}\n${lang.substring(0,2).toUpperCase()}: ${item.sentence_native || ''}`;
+  } else {
+    return `${item.word} [${item.pinyin}] ${item.english}\n例句：${item.sentence_zh}\n(${item.sentence_en})`;
+  }
+}
+
+function getFormattedMinimal(item) {
+  const lang = $('#targetLangSelect').value;
+  const hasSecond = (lang !== '英语' && item.native_def);
+  if (hasSecond) {
+    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${lang.substring(0,2).toUpperCase()}: ${item.native_def}`;
+  } else {
+    return `${item.word} [${item.pinyin}] - ${item.english}`;
+  }
+}
+
+function getFormattedSentence(item) {
+  const lang = $('#targetLangSelect').value;
+  const hasSecond = (lang !== '英语' && item.sentence_native);
+  if (hasSecond) {
+    return `${item.sentence_zh}\nEN: ${item.sentence_en}\n${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`;
+  } else {
+    return `${item.sentence_zh} (${item.sentence_en})`;
+  }
+}
+
+/* ================= 今日生词本操作 ================= */
+function renderVocabList() {
+  const container = $('#vocabListContainer');
+  $('#vocabCount').textContent = currentVocabList.length;
+
+  if (currentVocabList.length === 0) {
+    container.innerHTML = `
+      <div class="empty-tip" id="emptyTip">
+        暂无收藏生词<br>
+        在左侧查词后，点击<b>「收藏到生词本」</b><br>
+        下课后点击下方一键生成学生复习闪卡！
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = currentVocabList.map((item, idx) => {
+    const dualDef = item.native_def ? `EN: ${item.english} | 二翻: ${item.native_def}` : item.english;
+    return `
+    <div class="vocab-item" data-idx="${idx}">
+      <div class="vocab-item-main" onclick="loadWordFromList(${idx})">
+        <div class="vocab-item-top">
+          <span class="vocab-item-word">${item.word}</span>
+          <span class="vocab-item-py">${item.pinyin}</span>
+          ${item.hsk ? `<span class="word-badge" style="font-size:10px;">H${item.hsk}</span>` : ''}
+        </div>
+        <div class="vocab-item-dual">${dualDef}</div>
+      </div>
+      <div class="vocab-item-actions">
+        <button class="audio-btn" onclick="speak('${item.word}')" title="发音">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+          </svg>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="copyItem(${idx})" title="复制生词卡">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:14px;height:14px">
+            <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
+            <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
+          </svg>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem(${idx})" title="删除" style="padding:4px 6px;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  `;}).join("");
+}
+
+function loadWordFromList(idx) {
+  const item = currentVocabList[idx];
+  if (!item) return;
+  currentActiveWord = { ...item };
+  updateCardUI();
+  showToast(`已加载生词【${item.word}】`);
+}
+
+function copyItem(idx) {
+  const item = currentVocabList[idx];
+  if (!item) return;
+  copyToClipboard(getFormattedFull(item));
+}
+
+function deleteItem(idx) {
+  currentVocabList.splice(idx, 1);
+  saveList();
+  showToast("已从生词本移除");
+}
+
+/* ================= AI 随堂练习生成逻辑 ================= */
+async function triggerGenerateExercises() {
+  if (!currentVocabList.length) {
+    showToast("请先在左侧收藏一些生词再生成练习");
+    return;
+  }
+
+  const modal = $('#exerciseModal');
+  const container = $('#exerciseListContainer');
+  const loading = $('#exerciseLoadingTip');
+
+  modal.classList.add('active');
+  container.innerHTML = '';
+  loading.style.display = 'block';
+
+  const targetLang = $('#targetLangSelect').value;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8765/api/generate_exercises", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        words: currentVocabList,
+        target_lang: targetLang
+      })
+    });
+    const data = await res.json();
+    loading.style.display = 'none';
+
+    // 服务端返回结构为 data.data.exercises
+    let exs = null;
+    if (data && data.ok && data.data) {
+      if (Array.isArray(data.data.exercises) && data.data.exercises.length) {
+        exs = data.data.exercises;
+      } else if (Array.isArray(data.data) && data.data.length) {
+        exs = data.data;
+      }
+    }
+
+    if (exs && exs.length) {
+      currentExercises = exs;
+      renderExercises(currentExercises);
+      showToast(`✨ AI 随堂练习生成完毕 (共 ${exs.length} 道多题型练习)`);
+    } else {
+      currentExercises = generateOfflineExercises(currentVocabList);
+      renderExercises(currentExercises);
+      showToast("已切换到高质量离线题库");
+    }
+  } catch(e) {
+    loading.style.display = 'none';
+    currentExercises = generateOfflineExercises(currentVocabList);
+    renderExercises(currentExercises);
+  }
+}
+
+function generateOfflineExercises(vocabList) {
+  const words = vocabList.map(v => v.word);
+  return vocabList.slice(0, 4).map((item, i) => {
+    const rawSent = item.sentence_zh || "";
+    let qZh = "";
+    let qPy = "";
+
+    if (rawSent.includes(item.word)) {
+      qZh = rawSent.replace(item.word, "（____）");
+      qPy = (item.sentence_py || "").replace(item.pinyin, "（____）");
+    } else {
+      // 备选多样化口语句式
+      const patterns = [
+        { zh: `请在括号中填入最合适的词语：他在对话中（____）提到这件事。`, py: `Tā zài duìhuà zhōng (____) tídào zhè jiàn shì.` },
+        { zh: `说话人很着急：大家动作快一点儿，马上把这里（____）干净！`, py: `Dàjiā dòngzuò kuài yìdiǎnr, mǎshàng bǎ zhèlǐ (____) gānjìng!` },
+        { zh: `根据上下文选词：虽然遇到很多困难，但他从来没有（____）。`, py: `Suīrán yùdào hěn duō kùnnan, dàn tā cónglái méiyǒu (____).` },
+        { zh: `交际情境填空：你今天气色看起来很（____），昨天没休息好吗？`, py: `Nǐ jīntiān qìsè kàn qǐlái hěn (____), zuótiān méi xiūxi hǎo ma?` }
+      ];
+      const p = patterns[i % patterns.length];
+      qZh = p.zh;
+      qPy = p.py;
+    }
+
+    return {
+      id: i + 1,
+      type: "cloze",
+      typeName: (i === 0 ? "选词填空" : (i === 1 ? "语境填空" : "常用搭配")),
+      question: qZh,
+      pinyin: qPy,
+      translation: item.sentence_en || "Choose the best word to complete the sentence.",
+      options: shuffleArray([...words]),
+      answer: item.word,
+      explanation: `语境考查词语“${item.word}”（${item.english || item.pinyin}）的精准用法。`
+    };
+  });
+}
+
+function shuffleArray(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+function renderExercises(exercises) {
+  const container = $('#exerciseListContainer');
+  $('#exerciseCountBadge').textContent = `共 ${exercises.length} 道题`;
+
+  container.innerHTML = exercises.map((ex, idx) => `
+    <div class="exercise-card" id="exCard_${idx}">
+      <div class="exercise-q">${idx + 1}. ${ex.question}</div>
+      <div class="exercise-py">${ex.pinyin}</div>
+      <div class="exercise-trans">${ex.translation}</div>
+      <div class="exercise-options">
+        ${ex.options.map(opt => `
+          <button class="option-btn" onclick="checkAnswer(${idx}, '${opt}', '${ex.answer}', this)">${opt}</button>
+        `).join("")}
+      </div>
+      <div class="exercise-answer-box" id="exAnswer_${idx}">
+        <b>参考答案：</b>${ex.answer}
+        <div style="color:var(--ink-soft);font-size:12px;margin-top:2px;">${ex.explanation || ''}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function checkAnswer(idx, chosen, answer, btnEl) {
+  const card = document.getElementById(`exCard_${idx}`);
+  const allBtns = card.querySelectorAll('.option-btn');
+  allBtns.forEach(b => {
+    b.classList.remove('correct', 'wrong');
+    if (b.textContent === answer) b.classList.add('correct');
+  });
+  if (chosen === answer) {
+    showToast("回答正确！");
+  } else {
+    btnEl.classList.add('wrong');
+    showToast("选错啦，看绿色正确项");
+  }
+  document.getElementById(`exAnswer_${idx}`).classList.add('show');
+}
+
+function getExercisesStudentText() {
+  if (!currentExercises.length) return "";
+  const student = $('#studentName').value.trim() || 'Student';
+  let lines = [`今日随堂练习 / Practice Exercises (${student}):\n`];
+  currentExercises.forEach((ex, i) => {
+    lines.push(`${i+1}. ${ex.question}`);
+    lines.push(`   [${ex.pinyin}]`);
+    lines.push(`   选项: [ ${ex.options.join(' / ')} ]`);
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+function getExercisesFullText() {
+  if (!currentExercises.length) return "";
+  const student = $('#studentName').value.trim() || 'Student';
+  let lines = [`随堂练习（题目+参考答案及解析）- ${student}:\n`];
+  currentExercises.forEach((ex, i) => {
+    lines.push(`${i+1}. ${ex.question}`);
+    lines.push(`   [${ex.pinyin}]`);
+    lines.push(`   提示: ${ex.translation}`);
+    lines.push(`   选项: [ ${ex.options.join(' / ')} ]`);
+    lines.push(`   ★ 答案: ${ex.answer}`);
+    if (ex.explanation) lines.push(`   ★ 解析: ${ex.explanation}`);
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+/* ================= 课后闪卡网页生成内核 (含练习题) ================= */
+function generateStudentFlashcardHtml() {
+  const student = $('#studentName').value.trim() || 'Student';
+  const date = $('#lessonDate').value.trim() || todayStr;
+  const targetLang = $('#targetLangSelect').value;
+  const cardsDataJson = JSON.stringify(currentVocabList).replace(/</g, "\u003c");
+  const exercisesJson = JSON.stringify(currentExercises).replace(/</g, "\u003c");
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>词来 · ${student} 的汉语生词复习闪卡 (${date})</title>
+<style>
+:root {
+  --bg: #fdfbf7;
+  --card-bg: #ffffff;
+  --ink: #2b2723;
+  --ink-soft: #635c54;
+  --ink-dim: #999086;
+  --primary: #c26538;
+  --primary-light: #faece5;
+  --accent: #2e6b52;
+  --accent-light: #e8f3ee;
+  --danger: #b83c34;
+  --line: #e8e2d9;
+  --shadow: 0 12px 32px rgba(43,39,35,0.09);
+  --font-serif: "Songti SC", "Source Han Serif SC", "STSong", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 60px;
+}
+.c4d-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+}
+header {
+  width: 100%;
+  max-width: 580px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.title-box h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.title-box p {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin-top: 2px;
+}
+.mode-tabs {
+  display: flex;
+  background: #f0eae1;
+  padding: 3px;
+  border-radius: 8px;
+  gap: 2px;
+}
+.mode-tab {
+  border: none;
+  background: transparent;
+  padding: 6px 11px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mode-tab.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.card-scene {
+  width: 100%;
+  max-width: 480px;
+  height: 350px;
+  perspective: 1000px;
+  margin: 10px auto 20px;
+  cursor: pointer;
+}
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.4, 1.15);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+.card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-back {
+  transform: rotateY(180deg);
+  background: #ffffff;
+}
+.face-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.card-counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+.audio-btn {
+  background: var(--primary-light);
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+.audio-btn:active { transform: scale(0.92); }
+
+.face-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+.hanzi-main {
+  font-family: var(--font-serif);
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.pinyin-sub {
+  font-size: 22px;
+  color: var(--primary);
+  font-weight: 500;
+}
+.hint-text {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+
+.back-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  width: 100%;
+}
+.back-word-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.back-word-hz {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 700;
+}
+.back-word-py {
+  font-size: 17px;
+  color: var(--primary);
+  font-weight: 600;
+}
+.back-defs-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14.5px;
+}
+.back-def-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.back-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.tag-en-c { background: #eef2f6; color: #3b5998; }
+.tag-na-c { background: #faede6; color: #c26538; }
+
+.back-sent-box {
+  background: var(--bg);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  padding: 9px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.back-sent-zh {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.back-sent-py {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+.back-sent-trans {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.controls {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.self-assess {
+  display: flex;
+  gap: 12px;
+}
+.assess-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  transition: all 0.15s;
+}
+.assess-btn.btn-pass {
+  color: var(--accent);
+  border-color: rgba(46,107,82,0.3);
+}
+.assess-btn.btn-pass:active { background: var(--accent-light); }
+.assess-btn.btn-again {
+  color: var(--primary);
+  border-color: rgba(194,101,56,0.3);
+}
+.assess-btn.btn-again:active { background: var(--primary-light); }
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nav-btn {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: #eee8de;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--primary);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.view-section {
+  width: 100%;
+  max-width: 580px;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.view-section.active { display: flex; }
+.card-scene.hidden { display: none; }
+.controls.hidden { display: none; }
+
+.table-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.exercise-item {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.opt-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fdfbf7;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.opt-btn.correct { background: var(--accent); color: #fff; border-color: var(--accent); }
+.opt-btn.wrong { background: var(--danger); color: #fff; border-color: var(--danger); }
+</style>
+</head>
+<body>
+
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="c4d-spk" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff9a6c"/>
+      <stop offset="70%" stop-color="#c25220"/>
+      <stop offset="100%" stop-color="#8f300c"/>
+    </radialGradient>
+    <linearGradient id="c4d-cone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffbe99"/>
+      <stop offset="60%" stop-color="#d96633"/>
+      <stop offset="100%" stop-color="#a83c13"/>
+    </linearGradient>
+    <radialGradient id="c4d-pass" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#7fe0a6"/>
+      <stop offset="65%" stop-color="#2e9960"/>
+      <stop offset="100%" stop-color="#19633c"/>
+    </radialGradient>
+    <radialGradient id="c4d-again" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffb07a"/>
+      <stop offset="65%" stop-color="#d95e26"/>
+      <stop offset="100%" stop-color="#99380d"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<header>
+  <div class="title-box">
+    <h1>词来 · ${escapeHtml(student)} 的汉语生词复习闪卡</h1>
+    <p>英汉双语/二翻对照版 · ${escapeHtml(date)} · 共 <span id="totalCardsCount">0</span> 词</p>
+  </div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabFlashcards" onclick="switchMode('cards')">
+      <span>闪卡自测</span>
+    </button>
+    <button class="mode-tab" id="tabList" onclick="switchMode('list')">
+      <span>词表总览</span>
+    </button>
+    <button class="mode-tab" id="tabExercises" onclick="switchMode('exercises')">
+      <span>随堂练习</span>
+    </button>
+  </div>
+</header>
+
+<div class="card-scene" id="cardScene" onclick="flipCard()">
+  <div class="card-inner" id="cardInner">
+    <div class="card-face card-front">
+      <div class="face-top">
+        <span class="card-counter" id="frontCounter">1 / 1</span>
+        <button class="audio-btn" onclick="event.stopPropagation(); playCurrentWordAudio();" title="朗读">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:24px;height:24px;">
+            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
+            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
+            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="face-center">
+        <div class="hanzi-main" id="frontHanzi">词</div>
+        <div class="pinyin-sub" id="frontPinyin">cí</div>
+      </div>
+      <div class="hint-text" style="text-align:center;">点击卡片翻转看英汉双语释义与例句</div>
+    </div>
+
+    <div class="card-face card-back">
+      <div class="face-top">
+        <span class="card-counter" id="backCounter">1 / 1</span>
+        <button class="audio-btn" onclick="event.stopPropagation(); playCurrentSentenceAudio();" title="朗读例句">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:24px;height:24px;">
+            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
+            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
+            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="back-content">
+        <div class="back-word-row">
+          <span class="back-word-hz" id="backHanzi">词</span>
+          <span class="back-word-py" id="backPinyin">cí</span>
+        </div>
+        <div class="back-defs-box">
+          <div class="back-def-item">
+            <span class="back-tag tag-en-c">EN</span>
+            <span id="backEnglish">English definition</span>
+          </div>
+          <div class="back-def-item" id="boxBackNative">
+            <span class="back-tag tag-na-c" id="tagBackNative">二翻</span>
+            <span id="backNativeDef">Native definition</span>
+          </div>
+        </div>
+        <div class="back-sent-box">
+          <div class="back-sent-zh" id="backSentZh">这是例句。</div>
+          <div class="back-sent-py" id="backSentPy">Zhè shì lìjù.</div>
+          <div class="back-sent-trans" id="backSentEn" style="color:#4a5b78;">EN: Example English.</div>
+          <div class="back-sent-trans" id="backSentNative">二翻: Example Native.</div>
+        </div>
+      </div>
+      <div class="hint-text" style="text-align:center;">点击翻回正面</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls" id="cardControls">
+  <div class="self-assess">
+    <button class="assess-btn btn-again" onclick="markCard(false)">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" fill="url(#c4d-again)"/>
+        <path d="M14 24 C14 18.5, 18.5 14, 24 14 C28.5 14, 32.5 17, 33.6 21 M34 16 L34 21.5 L28.5 21.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M34 24 C34 29.5, 29.5 34, 24 34 C19.5 34, 15.5 31, 14.4 27 M14 32 L14 26.5 L19.5 26.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+      <span>还要再练</span>
+    </button>
+    <button class="assess-btn btn-pass" onclick="markCard(true)">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" fill="url(#c4d-pass)"/>
+        <path d="M15 24 L21 30 L33 17" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>我掌握了</span>
+    </button>
+  </div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="prevCard()">‹ 上一个</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <button class="nav-btn" onclick="nextCard()">下一个 ›</button>
+  </div>
+</div>
+
+<div class="view-section" id="listView"></div>
+
+<div class="view-section" id="exercisesView">
+  <div id="studentExercisesContainer" style="display:flex;flex-direction:column;gap:14px;"></div>
+</div>
+
+<script>
+const CARDS = ${cardsDataJson};
+const EXERCISES = ${exercisesJson};
+let currentIndex = 0;
+let mastered = new Set();
+
+document.getElementById('totalCardsCount').textContent = CARDS.length;
+
+function renderCurrentCard() {
+  if (!CARDS.length) return;
+  const c = CARDS[currentIndex];
+  document.getElementById('frontHanzi').textContent = c.word;
+  document.getElementById('frontPinyin').textContent = c.pinyin;
+  document.getElementById('frontCounter').textContent = (currentIndex + 1) + " / " + CARDS.length;
+
+  document.getElementById('backHanzi').textContent = c.word;
+  document.getElementById('backPinyin').textContent = c.pinyin;
+  document.getElementById('backEnglish').textContent = c.english || '';
+
+  const hasNative = !!(c.native_def && c.native_def.trim());
+  document.getElementById('boxBackNative').style.display = hasNative ? 'flex' : 'none';
+  if (hasNative) {
+    document.getElementById('backNativeDef').textContent = c.native_def;
+  }
+
+  document.getElementById('backSentZh').textContent = c.sentence_zh;
+  document.getElementById('backSentPy').textContent = c.sentence_py;
+  document.getElementById('backSentEn').textContent = "EN: " + (c.sentence_en || '');
+
+  const hasSentNative = !!(c.sentence_native && c.sentence_native.trim());
+  document.getElementById('backSentNative').style.display = hasSentNative ? 'block' : 'none';
+  if (hasSentNative) {
+    document.getElementById('backSentNative').textContent = "二翻: " + c.sentence_native;
+  }
+
+  document.getElementById('backCounter').textContent = (currentIndex + 1) + " / " + CARDS.length;
+  document.getElementById('cardInner').classList.remove('is-flipped');
+  document.getElementById('progressBar').style.width = ((mastered.size / CARDS.length) * 100) + "%";
+}
+
+function flipCard() {
+  document.getElementById('cardInner').classList.toggle('is-flipped');
+}
+
+function nextCard() {
+  if (currentIndex < CARDS.length - 1) {
+    currentIndex++;
+    renderCurrentCard();
+  } else {
+    currentIndex = 0;
+    renderCurrentCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCurrentCard();
+  }
+}
+
+function markCard(isPass) {
+  if (isPass) {
+    mastered.add(currentIndex);
+  } else {
+    mastered.delete(currentIndex);
+  }
+  nextCard();
+}
+
+function playSpeech(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = 0.88;
+  window.speechSynthesis.speak(u);
+}
+
+function playCurrentWordAudio() {
+  if (CARDS[currentIndex]) playSpeech(CARDS[currentIndex].word);
+}
+
+function playCurrentSentenceAudio() {
+  if (CARDS[currentIndex]) playSpeech(CARDS[currentIndex].sentence_zh);
+}
+
+function switchMode(mode) {
+  document.getElementById('tabFlashcards').classList.toggle('active', mode === 'cards');
+  document.getElementById('tabList').classList.toggle('active', mode === 'list');
+  document.getElementById('tabExercises').classList.toggle('active', mode === 'exercises');
+
+  document.getElementById('cardScene').classList.toggle('hidden', mode !== 'cards');
+  document.getElementById('cardControls').classList.toggle('hidden', mode !== 'cards');
+  document.getElementById('listView').classList.toggle('active', mode === 'list');
+  document.getElementById('exercisesView').classList.toggle('active', mode === 'exercises');
+
+  if (mode === 'list') renderListView();
+  if (mode === 'exercises') renderStudentExercises();
+}
+
+function renderListView() {
+  const lv = document.getElementById('listView');
+  lv.innerHTML = CARDS.map((c, i) => \`
+    <div class="table-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:baseline;">
+          <b style="font-size:20px;font-family:var(--font-serif)">\${c.word}</b>
+          <span style="color:var(--primary);font-weight:500">\${c.pinyin}</span>
+        </div>
+        <button class="audio-btn" style="width:32px;height:32px;" onclick="playSpeech('\${c.word}')">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:20px;height:20px;">
+            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
+            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
+            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+          </svg>
+        </button>
+      </div>
+      <div style="font-size:14px;color:var(--ink-soft)">
+        <b>EN:</b> \${c.english || ''} \${c.native_def ? ' | <b>二翻:</b> ' + c.native_def : ''}
+      </div>
+      <div style="background:var(--bg);padding:8px 12px;border-radius:6px;font-size:13.5px;border-left:3px solid var(--primary);">
+        <b>\${c.sentence_zh}</b><br>
+        <span style="color:var(--ink-dim);font-size:12px">\${c.sentence_py}</span><br>
+        <span style="color:#4a5b78;font-size:12.5px">EN: \${c.sentence_en || ''}</span>
+        \${c.sentence_native ? '<br><span style="color:var(--primary);font-size:12.5px">二翻: ' + c.sentence_native + '</span>' : ''}
+      </div>
+    </div>
+  \`).join("");
+}
+
+function renderStudentExercises() {
+  const container = document.getElementById('studentExercisesContainer');
+  if (!EXERCISES || !EXERCISES.length) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink-dim)">本次课暂未生成练习题，请先复习上方生词卡片。</div>';
+    return;
+  }
+  container.innerHTML = EXERCISES.map((ex, i) => \`
+    <div class="exercise-item" id="sExCard_\${i}">
+      <div style="font-size:16px;font-weight:600">\${i+1}. \${ex.question}</div>
+      <div style="font-size:13px;color:var(--ink-dim)">\${ex.pinyin}</div>
+      <div style="font-size:13.5px;color:var(--ink-soft)">\${ex.translation}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+        \${ex.options.map(opt => \`
+          <button class="opt-btn" onclick="studentCheckAnswer(\${i}, '\${opt}', '\${ex.answer}', this)">\${opt}</button>
+        \`).join("")}
+      </div>
+    </div>
+  \`).join("");
+}
+
+function studentCheckAnswer(idx, chosen, answer, btnEl) {
+  const card = document.getElementById('sExCard_' + idx);
+  const btns = card.querySelectorAll('.opt-btn');
+  btns.forEach(b => {
+    b.classList.remove('correct', 'wrong');
+    if (b.textContent === answer) b.classList.add('correct');
+  });
+  if (chosen !== answer) {
+    btnEl.classList.add('wrong');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+  if (e.code === 'ArrowRight') nextCard();
+  if (e.code === 'ArrowLeft') prevCard();
+});
+
+renderCurrentCard();
+<\/script>
+</body>
+</html>`;
+}
+
+/* ================= 页面主交互逻辑与绑定 ================= */
+document.addEventListener('DOMContentLoaded', () => {
+  initLangPicker();
+  checkServer();
+  loadSavedList();
+
+  // 1. 语言与引擎切换
+  $('#targetLangSelect').addEventListener('change', () => {
+    updateLabelsForLang();
+    saveList();
+    if (currentActiveWord && currentActiveWord.word) {
+      lookupWord(currentActiveWord.word);
+    }
+  });
+
+  // 2. 查词
+  $('#btnSearch').addEventListener('click', () => lookupWord($('#wordInput').value));
+  $('#wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      lookupWord($('#wordInput').value);
+    }
+  });
+
+  // 3. 发音
+  $('#btnAudioWord').addEventListener('click', () => speak($('#displayHanzi').textContent));
+  $('#displayHanzi').addEventListener('click', () => speak($('#displayHanzi').textContent));
+  $('#btnAudioSent').addEventListener('click', () => speak($('#displaySentZh').value));
+
+  // 4. AI 换例句主按钮
+  $('#btnAiRegen').addEventListener('click', triggerRegenSentence);
+
+  // 5. 例句历史前后步进按钮
+  $('#btnPrevSentence').addEventListener('click', () => stepHistory(-1));
+  $('#btnNextSentence').addEventListener('click', () => stepHistory(1));
+
+  // 6. 一键复制
+  $('#btnCopyFull').addEventListener('click', () => {
+    syncActiveWordFromUI();
+    copyToClipboard(getFormattedFull(currentActiveWord), "双语生词卡已复制到剪贴板！");
+  });
+
+  $('#btnCopyMinimal').addEventListener('click', () => {
+    syncActiveWordFromUI();
+    copyToClipboard(getFormattedMinimal(currentActiveWord), "精简双语已复制！");
+  });
+
+  $('#btnCopySentence').addEventListener('click', () => {
+    syncActiveWordFromUI();
+    copyToClipboard(getFormattedSentence(currentActiveWord), "仅例句已复制！");
+  });
+
+  // 7. 收藏到今日生词本
+  $('#btnCollect').addEventListener('click', () => {
+    syncActiveWordFromUI();
+    const idx = currentVocabList.findIndex(item => item.word === currentActiveWord.word);
+    if (idx >= 0) {
+      currentVocabList[idx] = { ...currentActiveWord };
+      showToast(`已更新生词本中的【${currentActiveWord.word}】`);
+    } else {
+      currentVocabList.push({ ...currentActiveWord });
+      showToast(`已收藏【${currentActiveWord.word}】到今日生词本！`);
+    }
+    saveList();
+    updateCardUI();
+  });
+
+  // 8. 清空生词本
+  $('#btnClearList').addEventListener('click', () => {
+    if (!currentVocabList.length) return;
+    if (confirm("确定要清空今日收藏的生词吗？")) {
+      currentVocabList = [];
+      currentExercises = [];
+      saveList();
+      showToast("生词本已清空");
+      updateCardUI();
+    }
+  });
+
+  // 9. 学生名字与日期更改
+  $('#studentName').addEventListener('change', loadSavedList);
+  $('#lessonDate').addEventListener('change', loadSavedList);
+
+  // 10. AI 一键生成随堂练习
+  $('#btnOpenExerciseModal').addEventListener('click', triggerGenerateExercises);
+  $('#btnCloseExerciseModal').addEventListener('click', () => {
+    $('#exerciseModal').classList.remove('active');
+  });
+  $('#exerciseModal').addEventListener('click', e => {
+    if (e.target === $('#exerciseModal')) {
+      $('#exerciseModal').classList.remove('active');
+    }
+  });
+
+  $('#btnCopyExercisesStudent').addEventListener('click', () => {
+    const text = getExercisesStudentText();
+    if (!text) {
+      showToast("练习题为空");
+      return;
+    }
+    copyToClipboard(text, "做题版练习已复制，可直接发给学生！");
+  });
+
+  $('#btnCopyExercisesFull').addEventListener('click', () => {
+    const text = getExercisesFullText();
+    if (!text) {
+      showToast("练习题为空");
+      return;
+    }
+    copyToClipboard(text, "题目+答案解析已复制到剪贴板！");
+  });
+
+  let showAnswersState = false;
+  $('#btnToggleAnswers').addEventListener('click', () => {
+    showAnswersState = !showAnswersState;
+    document.querySelectorAll('.exercise-answer-box').forEach(box => {
+      box.classList.toggle('show', showAnswersState);
+    });
+    $('#btnToggleAnswers').querySelector('span').textContent = showAnswersState ? "隐藏参考答案" : "显示参考答案";
+  });
+
+  $('#btnRegenExercises').addEventListener('click', triggerGenerateExercises);
+
+  // 11. 课后导出中心模态框
+  $('#btnOpenExportModal').addEventListener('click', () => {
+    if (!currentVocabList.length) {
+      showToast("请先在左侧收藏一些生词再导出闪卡");
+      return;
+    }
+    updateSummaryPreviewText();
+    $('#exportModal').classList.add('active');
+  });
+
+  $('#btnCloseModal').addEventListener('click', () => {
+    $('#exportModal').classList.remove('active');
+  });
+
+  $('#exportModal').addEventListener('click', e => {
+    if (e.target === $('#exportModal')) {
+      $('#exportModal').classList.remove('active');
+    }
+  });
+
+  // 12. 导出单文件复习网页 HTML
+  $('#btnDownloadHtmlCard').addEventListener('click', () => {
+    if (!currentVocabList.length) return;
+    const htmlContent = generateStudentFlashcardHtml();
+    const student = $('#studentName').value.trim() || 'Student';
+    const date = $('#lessonDate').value.trim() || todayStr;
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `词来_${student}_${date}_生词复习闪卡.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`已下载：词来_${student}_${date}_生词复习闪卡.html`);
+  });
+
+  // 13. 复制课后总结消息 (双语对照)
+  function generateSummaryText() {
+    const student = $('#studentName').value.trim() || 'Student';
+    const date = $('#lessonDate').value.trim() || todayStr;
+    const lang = $('#targetLangSelect').value;
+    const hasSecond = (lang !== '英语');
+
+    let lines = [`Hi ${student}!`, `Great job in today's Chinese lesson (${date})! Here is your vocabulary review:\n`];
+    currentVocabList.forEach((item, i) => {
+      lines.push(`${i+1}. ${item.word} [${item.pinyin}]`);
+      lines.push(`   EN: ${item.english}`);
+      if (hasSecond && item.native_def) {
+        lines.push(`   ${lang.substring(0,2).toUpperCase()}: ${item.native_def}`);
+      }
+      lines.push(`   例句: ${item.sentence_zh}`);
+      lines.push(`   EN: ${item.sentence_en}`);
+      if (hasSecond && item.sentence_native) {
+        lines.push(`   ${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`);
+      }
+      lines.push('');
+    });
+    lines.push(`Review tip: Open the attached flashcard HTML file on your phone or laptop to practice pronunciation, flip cards, and do the exercises.`);
+    lines.push(`See you next class!`);
+    return lines.join('\n');
+  }
+
+  function updateSummaryPreviewText() {
+    $('#summaryPreviewText').textContent = generateSummaryText();
+  }
+
+  $('#btnCopySummary').addEventListener('click', () => {
+    if (!currentVocabList.length) {
+      showToast("当前生词本为空");
+      return;
+    }
+    copyToClipboard(generateSummaryText(), "课后总结已复制到剪贴板！");
+  });
+
+  $('#btnCopySummaryMessage').addEventListener('click', () => {
+    copyToClipboard(generateSummaryText(), "课后总结已复制到剪贴板！");
+  });
+
+  // 14. 导出 Anki / Quizlet CSV
+  $('#btnExportCsv').addEventListener('click', () => {
+    if (!currentVocabList.length) return;
+    let csv = "Front\tPinyin\tBack\n";
+    currentVocabList.forEach(item => {
+      let back = `<b>EN:</b> ${item.english}`;
+      if (item.native_def) back += `<br><b>二翻:</b> ${item.native_def}`;
+      back += `<br><br><b>例句：</b>${item.sentence_zh}<br><i>${item.sentence_py}</i><br>EN: ${item.sentence_en}`;
+      if (item.sentence_native) back += `<br>二翻: ${item.sentence_native}`;
+      csv += `${item.word}\t${item.pinyin}\t"${back.replace(/"/g, '""')}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/tab-separated-values;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `词来_${$('#studentName').value.trim() || 'vocab'}_anki.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("已导出 Anki / Quizlet 格式文件");
+  });
+
+  // 15. 深色模式切换
+  $('#btnThemeToggle').addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  });
+
+  // 16. 快捷键
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      $('#exportModal').classList.remove('active');
+      $('#exerciseModal').classList.remove('active');
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && window.getSelection().toString() === '') {
+      if (document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        $('#btnCopyFull').click();
+      }
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      $('#btnCollect').click();
+    }
+    if (e.key === '/' && document.activeElement !== $('#wordInput') && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      $('#wordInput').focus();
+      $('#wordInput').select();
+    }
+  });
+
+  // 17. 技巧提示
+  $('#btnHelp').addEventListener('click', () => {
+    alert(
+      "【「词来」使用技巧】\n\n" +
+      "1. 翻译体系：英文翻译为必备基础项；可在顶部选择学生母语（西语、俄语、法语、德语等）作为二翻对照。\n" +
+      "2. 换例句功能升级：\n" +
+      "   - 点击「换例句」自动排除之前所有出现过的旧句，保证每次都是新句；\n" +
+      "   - 可点击「日常」「职场」「购物」「餐饮」「出行」切换特定教学语境；\n" +
+      "   - 右侧配有「‹」和「›」步进器，随时翻回之前生成过的句子！\n" +
+      "3. 随堂练习：点击右下角「AI 一键生成随堂练习」，自动根据今日生词生成互动选词填空，可一键复制发给学生互动！\n" +
+      "4. 快捷键盲操：按「/」查词，按「Cmd+C」复制，按「Cmd+S」收藏。"
+    );
+  });
+
+  lookupWord("顺便");
+});
+</script>
+</body>
+</html>
