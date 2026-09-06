@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- 2026-09-03 加（小克，K525 第 14 条）：页面全是内联脚本，script-src 只能留 'unsafe-inline'，
+     但外部脚本、object、base 劫持、表单外发这几条路照样堵死；connect/media 只放本机 8765。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob: http://127.0.0.1:8765; connect-src 'self' http://127.0.0.1:8765; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>词来 · 课堂生词速查与闪卡助手</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23c26538'/><text x='32' y='44' font-size='36' font-family='serif' fill='%23fff' text-anchor='middle'>词</text></svg>">
 <style>
@@ -101,16 +104,25 @@ header {
   background: var(--panel);
   border-bottom: 1px solid var(--line);
   padding: 11px 20px;
-  display: flex;
+  /* 2026-09-06 改（小克，K623）：原来是 flex-wrap，窗口一缩，四个工具块和右上角三个按钮
+     各自随机换行——老师说的「按钮乱跑」。改成 grid 三个固定区：品牌 | 工具栏 | 按钮；
+     窄了就让工具栏整行下移，品牌和按钮始终在第一行两端。 */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "brand bar actions";
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px 12px;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: var(--shadow-sm);
-  flex-wrap: wrap;
   -webkit-app-region: drag;
+}
+@media (max-width: 1400px) {
+  header {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "brand actions" "bar bar";
+  }
 }
 
 body.is-electron header {
@@ -118,6 +130,7 @@ body.is-electron header {
 }
 
 .brand {
+  grid-area: brand;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -140,14 +153,44 @@ body.is-electron header {
   border: 1px solid rgba(194,101,56,0.2);
 }
 .session-bar {
+  grid-area: bar;
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  /* auto-fit：有多宽放几列，永远不横向溢出；最窄一列 250px（学生块：图标+下拉+两个小钮+日期，再窄下拉只剩一个字） */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   align-items: stretch;
   gap: 10px;
-  flex: 1;
-  max-width: 960px;
+  min-width: 0;
   -webkit-app-region: no-drag;
 }
+.session-info > * { min-width: 0; }
+.session-student { gap: 5px; }
+.student-select {
+  flex: 1 1 60px;
+  min-width: 56px;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 0;
+}
+.mini-btn {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  -webkit-app-region: no-drag;
+}
+.mini-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.mini-btn-danger:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+.mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .session-info {
   display: flex;
   align-items: center;
@@ -184,8 +227,8 @@ body.is-electron header {
   overflow: hidden;
   white-space: nowrap;
 }
-.session-info input.student-name { width: 68px; flex: none; font-weight: 700; color: var(--primary); }
-.session-info input.lesson-date { width: 84px; flex: none; color: var(--ink-soft); font-size: 12px; }
+/* 日期：固定 80px 够放 2026-09-06，前面的学生选择器负责伸缩，日期不再被挤出框 */
+.session-info input.lesson-date { width: 80px; flex: none; color: var(--ink-soft); font-size: 12px; text-align: right; }
 .session-info select {
   width: 100%;
 }
@@ -207,9 +250,12 @@ body.is-electron header {
 }
 
 .header-actions {
+  grid-area: actions;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
   -webkit-app-region: no-drag;
 }
 .btn {
@@ -508,12 +554,8 @@ main {
   body.is-electron header {
     padding-left: 14px;
   }
-  .session-bar {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px;
-    width: 100%;
-    max-width: none;
-  }
+  .session-bar { gap: 8px; }
+  .header-actions .btn span:not(:first-child) { display: none; } /* 窄屏只留图标 */
   main {
     flex-direction: column !important;
     overflow: visible !important;
@@ -721,6 +763,27 @@ main {
 .tag-en { background: #eef2f6; color: #3b5998; }
 .tag-native { background: #faede6; color: var(--primary); }
 
+/* 2026-09-03 加（小克，老师报「拼音显示不全」）：例句四行原来是单行 <input type=text>，
+   一长就被裁掉看不见（截图里拼音只显示到 "kě"）。改成 textarea + 下面这段自动增高。 */
+/* 2026-09-03 加（小克）：连词成句的词块、情境问答的 A 台词、搭配题的目标词 */
+.exercise-blocks { display:flex; flex-wrap:wrap; gap:7px; margin:8px 0 4px; }
+.block-chip { padding:5px 12px; border:1px dashed var(--line); border-radius:8px;
+  background:var(--panel-alt); font-size:14px; font-weight:600; }
+.exercise-context { margin:8px 0 4px; padding:8px 12px; border-left:3px solid var(--accent);
+  background:var(--panel-alt); border-radius:0 8px 8px 0; font-size:14px; }
+.exercise-target { margin:6px 0 2px; font-size:13px; color:var(--ink-soft); }
+.ex-type { display:inline-block; padding:1px 8px; margin-right:6px; border-radius:6px;
+  background:var(--accent-light); color:var(--accent); font-size:11.5px; font-weight:700;
+  vertical-align:middle; }
+
+.editable-field.autogrow {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
 .editable-field {
   padding: 9px 13px;
   background: var(--panel-alt);
@@ -786,6 +849,27 @@ main {
   color: var(--primary);
   background: var(--primary-light);
   font-weight: 600;
+}
+/* 三档教学难度切换栏 */
+.diff-tabs-row { display: flex; align-items: center; gap: 8px; }
+.diff-tab-btn {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 14px;
+  background: var(--panel-alt);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.diff-tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+.diff-tab-btn.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(194, 101, 56, 0.15);
 }
 .history-stepper {
   display: flex;
@@ -944,7 +1028,19 @@ main {
   font-weight: 700;
   padding: 1px 7px;
   border-radius: 10px;
+  white-space: nowrap;
 }
+.list-header { flex-wrap: wrap; gap: 8px 10px; }
+.list-title { min-width: 0; }
+.list-title #nbTitle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.nb-filter { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; background: var(--panel-alt); }
+.nb-filter-btn { border: none; background: transparent; padding: 4px 9px; font-size: 12px; color: var(--ink-soft); cursor: pointer; }
+.nb-filter-btn.active { background: var(--primary); color: #fff; }
+.nb-switch { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-soft); cursor: pointer; white-space: nowrap; }
+.nb-switch input { accent-color: var(--accent); margin: 0; }
+.nb-date-head { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; padding: 6px 2px 0; letter-spacing: 0.3px; }
+.nb-date-head:first-child { padding-top: 0; }
 .list-body {
   flex: 1;
   overflow-y: auto;
@@ -1011,6 +1107,22 @@ main {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+.copy-list-btn {
+  min-width: 26px;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--panel);
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.copy-list-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
 }
 .list-footer {
   padding: 15px 18px;
@@ -1294,11 +1406,16 @@ main {
 
   <div class="session-bar">
     <!-- 1. 学生与日期 -->
-    <div class="session-info" title="当前课程学生与日期">
+    <!-- 2026-09-06 改（小克，K623）：原来是个自由文本框＋隐藏 datalist，「加学生」等于偷偷改个名字，
+         「删学生」删的是后端编的假名单。现在是真名单：下拉切换、＋ 添加、🗑 删除。
+         #studentName 保留成隐藏域，全文几十处 $('#studentName').value 照旧能用。 -->
+    <div class="session-info session-student" title="当前学生与课程日期">
       <img src="assets/icons/student.png" class="c4d-png-icon" alt="学生" onerror="this.style.display='none'">
-      <input type="text" id="studentName" class="student-name" value="Alex" title="点击修改学生名字">
-      <span style="color:var(--line-dark);font-size:11px;">/</span>
-      <input type="text" id="lessonDate" class="lesson-date" value="" title="课程日期">
+      <select id="studentSelect" class="student-select" title="切换学生"></select>
+      <input type="hidden" id="studentName" value="">
+      <button type="button" class="mini-btn" id="btnAddStudent" title="添加学生">＋</button>
+      <button type="button" class="mini-btn mini-btn-danger" id="btnDeleteStudent" title="删除当前学生（生词本一起移入废纸篓）">🗑</button>
+      <input type="text" id="lessonDate" class="lesson-date" value="" title="课程日期（YYYY-MM-DD）">
     </div>
 
     <!-- 2. 第二外语 / 母语二翻切换 (洲际排列 + 搜索 + 收藏) -->
@@ -1351,6 +1468,7 @@ main {
       <img src="assets/icons/ai.png" class="c4d-png-icon" alt="引擎" onerror="this.style.display='none'">
       <span class="session-info-label">引擎:</span>
       <select id="engineSelect">
+        <option value="deepseek">DeepSeek (智能出题/例句 · 推荐)</option>
         <option value="qwen">通义千问 (极速直连)</option>
         <option value="google_v3">Google Cloud Translation</option>
         <option value="gemini">Google Gemini (多语言)</option>
@@ -1478,16 +1596,13 @@ main {
           </div>
 
           <div class="sentence-box">
-            <!-- 场景快捷切换条与前后回溯 -->
+            <!-- 教学难度三档切换栏 (简单句 / 中等难度 / 复杂句) -->
             <div class="sent-header-row">
-              <div class="scenario-bar">
-                <span style="font-size:11.5px;color:var(--ink-dim)">语境:</span>
-                <span class="scenario-chip active" data-sc="" onclick="selectScenario('')">全场景轮换</span>
-                <span class="scenario-chip" data-sc="日常起居" onclick="selectScenario('日常起居')">日常起居</span>
-                <span class="scenario-chip" data-sc="职场工作" onclick="selectScenario('职场工作')">职场工作</span>
-                <span class="scenario-chip" data-sc="购物超市" onclick="selectScenario('购物超市')">购物超市</span>
-                <span class="scenario-chip" data-sc="餐饮聚会" onclick="selectScenario('餐饮聚会')">餐饮聚会</span>
-                <span class="scenario-chip" data-sc="交通出行" onclick="selectScenario('交通出行')">交通出行</span>
+              <div class="diff-tabs-row" id="diffTabsRow">
+                <span style="font-size:11.5px;color:var(--ink-dim);margin-right:4px;">教学难度:</span>
+                <span class="diff-tab-btn" data-diff="simple" onclick="selectDifficulty('simple')">简单句 (初级)</span>
+                <span class="diff-tab-btn active" data-diff="medium" onclick="selectDifficulty('medium')">中等难度 (中级)</span>
+                <span class="diff-tab-btn" data-diff="complex" onclick="selectDifficulty('complex')">复杂句 (高级)</span>
               </div>
 
               <!-- 上一句/下一句回溯 -->
@@ -1499,7 +1614,7 @@ main {
             </div>
 
             <div class="sent-zh">
-              <input type="text" id="displaySentZh" class="editable-field" style="flex:1;font-weight:600;font-size:16.5px;" value="你去超市的时候，能顺便帮我买瓶牛奶吗？">
+              <textarea id="displaySentZh" class="editable-field autogrow" rows="1" style="flex:1;font-weight:600;font-size:16.5px;resize:none;overflow:hidden;">你去超市的时候，能顺便帮我买瓶牛奶吗？</textarea>
               <button class="audio-btn" id="btnAudioSent" title="朗读例句">
                 <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
                   <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
@@ -1510,15 +1625,15 @@ main {
               </button>
             </div>
             <div class="sent-py">
-              <input type="text" id="displaySentPy" class="editable-field" style="font-size:13px;" value="Nǐ qù chāoshì de shíhou, néng shùnbiàn bāng wǒ mǎi píng niúnǎi ma?">
+              <textarea id="displaySentPy" class="editable-field autogrow" rows="1" style="font-size:13px;resize:none;overflow:hidden;">Nǐ qù chāoshì de shíhou, néng shùnbiàn bāng wǒ mǎi píng niúnǎi ma?</textarea>
             </div>
             <div class="sent-en-row">
               <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
-              <input type="text" id="displaySentEn" class="editable-field" style="flex:1;font-size:13.5px;" value="When you go to the supermarket, could you buy a bottle of milk for me by the way?">
+              <textarea id="displaySentEn" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;">When you go to the supermarket, could you buy a bottle of milk for me by the way?</textarea>
             </div>
             <div class="sent-native-row" id="rowSentNative">
               <span class="field-tag-badge tag-native" id="tagSentNative" style="flex-shrink:0;">二翻</span>
-              <input type="text" id="displaySentNative" class="editable-field" style="flex:1;font-size:13.5px;" value="¿Cuando vayas al supermercado, puedes traerme una botella de leche de paso?">
+              <textarea id="displaySentNative" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;">¿Cuando vayas al supermercado, puedes traerme una botella de leche de paso?</textarea>
             </div>
           </div>
         </div>
@@ -1526,7 +1641,7 @@ main {
 
       <div class="card-actions">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <button class="copy-btn-primary" id="btnCopyFull" title="一键复制双语对照格式 (快捷键: Cmd+C)">
+          <button class="copy-btn-primary" id="btnCopyFull" title="复制整张卡（翻译+例句，快捷键: Cmd+C）">
             <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
               <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
               <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
@@ -1534,7 +1649,7 @@ main {
               <rect x="15" y="27.5" width="14" height="2.5" rx="1.2" fill="#e8c3b0"/>
               <rect x="17" y="5" width="14" height="8" rx="4" fill="#ffdf73"/>
             </svg>
-            <span>一键复制生词卡</span>
+            <span>复制整张卡</span>
             <span class="kbd-hint">⌘C</span>
           </button>
           <button class="collect-btn" id="btnCollect" title="收藏到生词本 (快捷键: Cmd+S)">
@@ -1548,8 +1663,8 @@ main {
 
         <div class="copy-presets">
           <span style="font-size:12px;color:var(--ink-dim)">快捷复制:</span>
-          <button class="copy-chip" id="btnCopyMinimal">精简版</button>
-          <button class="copy-chip" id="btnCopySentence">仅例句</button>
+          <button class="copy-chip" id="btnCopyMinimal" title="只复制词语、拼音和释义">仅翻译</button>
+          <button class="copy-chip" id="btnCopySentence" title="只复制中文例句及其对照翻译">仅例句</button>
         </div>
       </div>
     </div>
@@ -1561,21 +1676,22 @@ main {
       <div class="list-header">
         <div class="list-title">
           <img src="assets/icons/vocab.png" class="c4d-png-icon" alt="生词本" onerror="this.style.display='none'">
-          <span>今日课堂生词</span>
+          <span id="nbTitle">生词本</span>
           <span class="list-count-badge" id="vocabCount">0</span>
         </div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-secondary btn-sm" id="btnClearList" title="清空当前列表">清空</button>
+        <div class="list-tools">
+          <div class="nb-filter" id="nbFilter" title="今天＝只看课程日期这天加的词；全部＝这个学生历来所有的词">
+            <button type="button" class="nb-filter-btn active" data-f="today">今天</button>
+            <button type="button" class="nb-filter-btn" data-f="all">全部</button>
+          </div>
+          <label class="nb-switch" title="开着：查过的词自动进当前学生的生词本；关掉：要手动点「收藏」">
+            <input type="checkbox" id="autoCollectToggle" checked><span>搜过即收</span>
+          </label>
+          <button class="btn btn-secondary btn-sm" id="btnClearList" title="清空当前显示的这些词">清空</button>
         </div>
       </div>
 
-      <div class="list-body" id="vocabListContainer">
-        <div class="empty-tip" id="emptyTip">
-          暂无收藏生词<br>
-          在左侧查词后，点击<b>「收藏到生词本」</b><br>
-          下课后点击下方一键生成学生复习闪卡！
-        </div>
-      </div>
+      <div class="list-body" id="vocabListContainer"></div>
 
       <div class="list-footer">
         <!-- AI 一键生成练习按钮 -->
@@ -1608,6 +1724,28 @@ main {
 
 
 <!-- 模态框 3：自定义 AI 与密钥设置中心 -->
+<div class="modal-overlay" id="studentModal">
+  <div class="modal-window" style="max-width:420px;">
+    <div class="modal-header">
+      <h3><span>👤</span><span>添加学生</span></h3>
+      <button class="btn btn-secondary btn-sm" id="btnCloseStudentModal" style="padding:4px 8px;">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label" style="font-size:13px;"><span>学生名字（生词本和闪卡文件都按它命名）</span></label>
+        <input type="text" id="inputNewStudentName" class="editable-field" placeholder="例如 Mike" autocomplete="off" maxlength="40">
+      </div>
+      <div style="font-size:12.5px;color:var(--ink-soft);line-height:1.6;">
+        二翻语种先用顶栏当前选的（<b id="newStudentLangHint">西班牙语</b>），以后在顶栏改会记在这个学生名下。
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-secondary" id="btnCancelStudentModal">取消</button>
+        <button class="btn btn-primary" id="btnConfirmAddStudent">添加并切换</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-window" style="max-width:560px;">
     <div class="modal-header">
@@ -1621,7 +1759,15 @@ main {
     <div class="modal-body">
       <div style="font-size:13px;color:var(--ink-soft);line-height:1.6;background:var(--panel-alt);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);">
         💡 <b>小白开箱即用说明</b>：不填任何 Key 也完全不影响使用！「词来」自带 19.8 万离线词库、拼音、离线生活例句、一键复制与课后闪卡导出。<br>
-        如果您需要启用<b>通义千问极速出题</b>或<b>豆包超拟人发音</b>，可在此保存您的专属 Key（保存在本机，绝不上云）。
+        如果您需要启用<b>DeepSeek 高质量智能出题</b>、<b>通义千问极速出题</b>或<b>豆包超拟人发音</b>，可在此保存您的专属 Key（保存在本机，绝不上云）。
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="font-size:13px;">
+          <span>DeepSeek API Key (智能出题/例句主力 · 推荐)</span>
+          <a href="https://platform.deepseek.com/" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px;">获取 API Key ↗</a>
+        </label>
+        <input type="password" id="inputDeepseekKey" class="editable-field" placeholder="sk-..." autocomplete="off">
       </div>
 
       <div class="field-group">
@@ -1778,8 +1924,25 @@ const now = new Date();
 const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 $('#lessonDate').value = todayStr;
 
-const getStorageKey = () => `cilai_vocab_${$('#studentName').value.trim() || 'default'}_${$('#lessonDate').value.trim() || todayStr}`;
-const getStudentLangKey = () => `cilai_student_lang_${$('#studentName').value.trim() || 'default'}`;
+/* 2026-09-06 改（小克，K623）：生词本按**学生**分本，不再按「学生＋日期」分——原来换个日期就是一本空的，
+   老师说「无法为单独学生创建单词本」就是这个。每条生词带 added=YYYY-MM-DD，右栏用「今天／全部」筛。
+   旧的 cilai_vocab_<名>_<日期> 在 loadSavedList 里一次性并进新本子，不丢。 */
+const API = (location.protocol === 'http:' || location.protocol === 'https:') ? location.origin : 'http://127.0.0.1:8765';
+const currentStudent = () => $('#studentName').value.trim();
+const currentLessonDate = () => $('#lessonDate').value.trim() || todayStr;
+const getStorageKey = () => `cilai_nb_${currentStudent() || 'default'}`;
+const getStudentLangKey = () => `cilai_student_lang_${currentStudent() || 'default'}`;
+let nbFilter = localStorage.getItem('cilai_nb_filter') || 'today';
+const autoCollectOn = () => localStorage.getItem('cilai_auto_collect') !== '0';
+let students = [];
+function visibleVocab() {
+  if (nbFilter === 'all') return currentVocabList.slice();
+  const d = currentLessonDate();
+  return currentVocabList.filter(it => (it.added || '') === d);
+}
+function escapeHtml(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 let currentVocabList = [];
 let currentExercises = [];
@@ -1806,11 +1969,35 @@ let isServerOnline = false;
 // 检查本地伴侣服务
 async function checkServer() {
   try {
-    const res = await fetch("http://127.0.0.1:8765/api/status");
+    const res = await fetch(`${API}/api/status`);
     const data = await res.json();
     if (data && data.ok) {
       isServerOnline = true;
-      $('#serverStatusTag').innerHTML = `● 服务已就绪 (${data.has_dashscope ? 'Qwen✓ ' : ''}${data.has_gemini ? 'Gemini✓' : ''})`;
+      /* 2026-09-03 改（小克）：原来按「有没有配 key」显示 Gemini✓，可后端根本没实现 Gemini，
+         下拉框里它是灰的——状态条说有、选项说没有，自相矛盾。改成按真正能跑的引擎显示。 */
+      const runnable = Array.isArray(data.engines)
+        ? data.engines.filter(e => e !== 'offline')
+        : (data.has_dashscope ? ['qwen'] : []);
+      $('#serverStatusTag').innerHTML = runnable.length
+        ? `● 服务已就绪（${runnable.join(' / ')}）`
+        : `● 服务已就绪（仅离线词库）`;
+      /* 2026-09-03 加（小克，K525 第 12 条）：把后端没实现的引擎置灰。
+         之前下拉框 4 个选项后端只跑 1 个，选了也没提示，等于骗人。
+         后端 /api/status 现在如实报 engines，旧版桥没有这个字段就不动（向后兼容）。 */
+      if (Array.isArray(data.engines)) {
+        const sel = $('#engineSelect');
+        if (sel) {
+          [...sel.options].forEach(o => {
+            const ok = data.engines.includes(o.value);
+            o.disabled = !ok;
+            const base = o.textContent.replace(/（后端未实现）$/, '');
+            o.textContent = ok ? base : base + '（后端未实现）';
+          });
+          if (sel.selectedOptions[0]?.disabled) {
+            sel.value = data.engines.includes('qwen') ? 'qwen' : data.engines[0];
+          }
+        }
+      }
       $('#serverStatusTag').style.color = "var(--accent)";
     }
   } catch (e) {
@@ -2130,8 +2317,25 @@ function closeLangPicker() {
   $('#langPickerDropdown').classList.remove('active');
 }
 
-// 载入本地缓存生词本
-function loadSavedList() {
+/* 把升级前按日期存的旧 key 并成一本（只在这个学生还没有新本子时跑一次） */
+function migrateLegacyKeys(name) {
+  const out = [], seen = new Set();
+  if (!name) return out;
+  const prefix = `cilai_vocab_${name}_`;
+  Object.keys(localStorage).filter(k => k.startsWith(prefix)).sort().forEach(k => {
+    const date = k.slice(prefix.length);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    try {
+      (JSON.parse(localStorage.getItem(k)) || []).forEach(it => {
+        if (it && it.word && !seen.has(it.word)) { seen.add(it.word); out.push({ ...it, added: it.added || date }); }
+      });
+    } catch(e) {}
+  });
+  return out;
+}
+
+// 载入当前学生的整本生词本（本机为主，服务端做备份与迁移来源）
+async function loadSavedList() {
   const savedLang = localStorage.getItem(getStudentLangKey());
   if (savedLang) {
     $('#targetLangSelect').value = savedLang;
@@ -2139,13 +2343,31 @@ function loadSavedList() {
   updateLabelsForLang();
   updateLanguageDisplayButton();
 
+  const name = currentStudent();
+  let list = null;
   try {
     const raw = localStorage.getItem(getStorageKey());
-    currentVocabList = raw ? (JSON.parse(raw) || []) : [];
-  } catch(e) {
-    currentVocabList = [];
+    if (raw) list = JSON.parse(raw) || [];
+  } catch(e) {}
+  if (!list) {
+    list = migrateLegacyKeys(name);
+    if (isServerOnline && name) {
+      try {
+        const r = await fetch(`${API}/api/notebook?student=${encodeURIComponent(name)}`);
+        const d = await r.json();
+        if (d && d.ok && d.notebook && Array.isArray(d.notebook.vocab)) {
+          const have = new Set(list.map(it => it.word));
+          d.notebook.vocab.forEach(it => { if (it && it.word && !have.has(it.word)) { have.add(it.word); list.push(it); } });
+          if (!savedLang && d.notebook.target_lang) $('#targetLangSelect').value = d.notebook.target_lang;
+        }
+      } catch(e) {}
+    }
+    if (list.length) { try { localStorage.setItem(getStorageKey(), JSON.stringify(list)); } catch(e) {} }
   }
+  if (name !== currentStudent()) return;   // 等 fetch 的时候老师又切了人，别把别人的本子贴过来
+  currentVocabList = list.map(it => ({ ...it, added: it.added || todayStr }));
   renderVocabList();
+  if (typeof updateCardUI === 'function') updateCardUI();
 }
 
 function saveList() {
@@ -2154,16 +2376,12 @@ function saveList() {
     localStorage.setItem(getStudentLangKey(), $('#targetLangSelect').value);
   } catch(e) {}
 
-  if (isServerOnline) {
-    fetch("http://127.0.0.1:8765/api/save_lesson", {
+  const name = currentStudent();
+  if (isServerOnline && name) {
+    fetch(`${API}/api/notebook`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        student: $('#studentName').value.trim(),
-        date: $('#lessonDate').value.trim(),
-        target_lang: $('#targetLangSelect').value,
-        vocab: currentVocabList
-      })
+      body: JSON.stringify({ student: name, target_lang: $('#targetLangSelect').value, vocab: currentVocabList })
     }).catch(()=>{});
   }
   renderVocabList();
@@ -2235,7 +2453,7 @@ function speak(text) {
     activeAudioPlayer = null;
   }
 
-  const url = `http://127.0.0.1:8765/api/tts?text=${encodeURIComponent(cleanText)}&speaker=${encodeURIComponent(speaker)}`;
+  const url = `${API}/api/tts?text=${encodeURIComponent(cleanText)}&speaker=${encodeURIComponent(speaker)}`;
   const audio = new Audio(url);
   activeAudioPlayer = audio;
 
@@ -2315,7 +2533,7 @@ function getPinyinForText(str) {
 }
 
 // 查词主逻辑
-async function lookupWord(rawWord) {
+async function lookupWord(rawWord, opts = {}) {
   const word = rawWord.trim();
   if (!word) return;
 
@@ -2380,6 +2598,7 @@ async function lookupWord(rawWord) {
   currentHistoryIndex = wordSentenceHistory[word].length - 1;
 
   updateCardUI();
+  if (!opts.noCollect) autoCollectIfEnabled();
 
   if (isServerOnline && engine !== 'offline') {
     requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, false);
@@ -2387,6 +2606,174 @@ async function lookupWord(rawWord) {
 }
 
 // 场景切换快速触发
+let currentDifficulty = 'medium';
+function selectDifficulty(diff) {
+  currentDifficulty = diff;
+  document.querySelectorAll('#diffTabsRow .diff-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-diff') === diff);
+  });
+  if (currentActiveWord && currentActiveWord.word) {
+    requestAiSentence(
+      currentActiveWord.word,
+      currentActiveWord.pinyin,
+      currentActiveWord.english,
+      $('#targetLangSelect').value,
+      $('#engineSelect').value,
+      true
+    );
+  }
+}
+
+/* ================= 学生名单（2026-09-06 小克，K623） =================
+   名单存两处：本机 localStorage.cilai_students（离线也能用）＋ 服务端 students_meta.json（备份）。
+   启动时取并集，再把升级前只存在 history/ 或旧 key 里的名字也捞进来。 */
+function persistStudentsLocal() {
+  try { localStorage.setItem('cilai_students', JSON.stringify(students)); } catch(e) {}
+}
+
+function renderStudentSelect() {
+  const sel = $('#studentSelect');
+  const cur = currentStudent();
+  sel.innerHTML = students.length
+    ? students.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('')
+    : '<option value="">（还没有学生）</option>';
+  sel.value = cur;
+  if (sel.value !== cur) sel.value = students.length ? students[0].name : '';
+  $('#studentName').value = sel.value || '';
+  $('#btnDeleteStudent').disabled = !students.length;
+  $('#nbTitle').textContent = sel.value ? `${sel.value} 的生词本` : '生词本';
+}
+
+async function initStudents() {
+  let local = [];
+  try { local = JSON.parse(localStorage.getItem('cilai_students') || '[]') || []; } catch(e) {}
+  let remote = [];
+  if (isServerOnline) {
+    try {
+      const r = await fetch(`${API}/api/students`);
+      const d = await r.json();
+      if (d && d.ok && Array.isArray(d.students)) remote = d.students;
+    } catch(e) {}
+  }
+  const seen = new Set();
+  students = [];
+  [...remote, ...local].forEach(s => {
+    const n = ((s && s.name) || '').trim();
+    if (n && !seen.has(n)) { seen.add(n); students.push({ name: n, lang: s.lang || '' }); }
+  });
+  Object.keys(localStorage).forEach(k => {
+    const m = k.match(/^cilai_vocab_(.+)_\d{4}-\d{2}-\d{2}$/);
+    if (m && m[1] !== 'default' && !seen.has(m[1])) { seen.add(m[1]); students.push({ name: m[1], lang: '' }); }
+  });
+  students.sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+  persistStudentsLocal();
+  const remembered = localStorage.getItem('cilai_current_student') || '';
+  $('#studentName').value = students.some(s => s.name === remembered) ? remembered : (students[0] ? students[0].name : '');
+  renderStudentSelect();
+}
+
+async function switchStudent(name) {
+  $('#studentName').value = name || '';
+  try { localStorage.setItem('cilai_current_student', name || ''); } catch(e) {}
+  renderStudentSelect();
+  await loadSavedList();
+}
+
+function openStudentModal() {
+  $('#newStudentLangHint').textContent = $('#targetLangSelect').value || '英语';
+  $('#inputNewStudentName').value = '';
+  $('#studentModal').classList.add('active');
+  setTimeout(() => $('#inputNewStudentName').focus(), 50);
+}
+
+async function addStudent(rawName) {
+  const name = (rawName || '').trim().replace(/[\\/*?:"<>|]/g, '');
+  if (!name) { showToast('先写个名字'); return false; }
+  if (students.some(s => s.name === name)) {
+    showToast(`已经有【${name}】了，直接切过去`);
+    await switchStudent(name);
+    return true;
+  }
+  const rec = { name, lang: $('#targetLangSelect').value, created: todayStr };
+  students.push(rec);
+  students.sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+  persistStudentsLocal();
+  try { localStorage.setItem(`cilai_student_lang_${name}`, rec.lang); } catch(e) {}
+  if (isServerOnline) {
+    try {
+      await fetch(`${API}/api/students`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student: rec })
+      });
+    } catch(e) {}
+  }
+  await switchStudent(name);
+  showToast(`已添加【${name}】，现在查的词都会进 ta 的生词本`);
+  return true;
+}
+
+async function deleteCurrentStudent() {
+  const name = currentStudent();
+  if (!name) return;
+  const n = currentVocabList.length;
+  const msg = `删除学生【${name}】？\n` +
+    (n ? `ta 的 ${n} 个生词会一起移入废纸篓（可在 history/废纸篓/ 里找回）。` : `ta 还没有生词。`) +
+    `\n别的学生不受影响。`;
+  if (!confirm(msg)) return;
+
+  students = students.filter(s => s.name !== name);
+  persistStudentsLocal();
+  try {
+    localStorage.removeItem(getStorageKey());
+    localStorage.removeItem(getStudentLangKey());
+    Object.keys(localStorage).forEach(k => { if (k.startsWith(`cilai_vocab_${name}_`)) localStorage.removeItem(k); });
+  } catch(e) {}
+
+  if (isServerOnline) {
+    try {
+      const res = await fetch(`${API}/api/delete_student`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (!(data && data.ok)) showToast(`服务端没删干净：${(data && data.error) || '未知原因'}`);
+    } catch (e) {
+      showToast("服务没连上，只删了本机这份");
+    }
+  }
+  const next = students[0] ? students[0].name : '';
+  await switchStudent(next);
+  showToast(next ? `已删除【${name}】，切到【${next}】` : `已删除【${name}】。现在没有学生了，点顶栏「＋」加一个`);
+}
+
+/* ================= 搜过即收（2026-09-06 小克，K623） =================
+   老师原话「搜过的词自动加入该学生的生词表」。查到词就进本子；AI 二翻/例句回来后再把那条同步一次。 */
+let warnedNoStudent = false;
+function autoCollectIfEnabled() {
+  if (!autoCollectOn()) return;
+  const w = currentActiveWord && currentActiveWord.word;
+  if (!w) return;
+  const name = currentStudent();
+  if (!name) {
+    if (!warnedNoStudent) { warnedNoStudent = true; showToast('还没有学生：点顶栏「＋」加一个，查过的词才有地方放'); }
+    return;
+  }
+  if (currentVocabList.some(it => it.word === w)) return;
+  currentVocabList.push({ ...currentActiveWord, added: currentLessonDate() });
+  saveList();
+  updateCardUI();
+  showToast(`【${w}】已自动加入 ${name} 的生词本`);
+}
+
+function syncNotebookEntryFromCard() {
+  const w = currentActiveWord && currentActiveWord.word;
+  if (!w) return;
+  const idx = currentVocabList.findIndex(it => it.word === w);
+  if (idx < 0) return;
+  currentVocabList[idx] = { ...currentVocabList[idx], ...currentActiveWord, added: currentVocabList[idx].added || currentLessonDate() };
+  saveList();
+}
+
 function selectScenario(sc) {
   currentSelectedScenario = sc;
   document.querySelectorAll('.scenario-chip').forEach(c => {
@@ -2484,7 +2871,7 @@ async function requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, 
     const pool = wordSentenceHistory[word] || [];
     const avoidList = pool.map(s => s.sentence_zh).filter(Boolean);
 
-    const res = await fetch("http://127.0.0.1:8765/api/generate_sentence", {
+    const res = await fetch(`${API}/api/generate_sentence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2493,6 +2880,7 @@ async function requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, 
         english: baseEnglish,
         target_lang: targetLang,
         engine: engine,
+        difficulty: currentDifficulty || 'medium',
         avoid_sentences: avoidList,
         scenario: currentSelectedScenario
       })
@@ -2515,13 +2903,51 @@ async function requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, 
       );
 
       updateCardUI();
-      showToast(isRegen ? `已换新例句（${currentSelectedScenario || '全新语境'}）` : `已生成双语词条`);
+      syncNotebookEntryFromCard();
+      const usedNote = (data.data && data.engine_used && data.engine_used !== engine)
+        ? `（实际用的是 ${data.engine_used}）` : "";
+      showToast((isRegen ? `已换新例句（${currentSelectedScenario || '全新语境'}）` : `已生成双语词条`) + usedNote);
+    } else {
+      /* 2026-09-03 加（小克，K525 第 11 条）：原来只有成功分支。后端返回 ok:false
+         （没配 key、超时、模型报错）时既没提示也不兜底——老师课上点「换例句」，
+         按钮转一圈、句子纹丝不动、没有任何解释。 */
+      showToast(`例句生成失败：${(data && data.error) || '未知原因'}，已切回离线句式`);
+      cycleOfflineSentence();
     }
   } catch (e) {
-    if (isRegen) cycleOfflineSentence();
+    showToast(`例句请求出错：${e.message || e.name}，已切回离线句式`);
+    cycleOfflineSentence();
   } finally {
     $('#btnAiRegen').querySelector('span').textContent = "换例句";
   }
+}
+
+/* 2026-09-03 加（小克）：textarea 自动贴合内容高度，长拼音不再被裁。 */
+function autoGrow(el) {
+  if (!el) return;
+  /* ⚠️ 2026-09-03（小克实犯）：不加这道保护会算出离谱的高度。
+     元素所在的面板还没显示时 clientWidth 是 0，129 个字符按 0 宽度换行 →
+     scrollHeight 算成 2027px，直接把框撑成 100 行。量不准就别动，
+     等下面的 ResizeObserver 拿到真实宽度再算。 */
+  if (!el.isConnected || el.offsetParent === null || el.clientWidth < 40) return;
+  el.style.height = "auto";
+  el.style.height = (el.scrollHeight + 2) + "px";
+}
+function autoGrowAll() {
+  document.querySelectorAll("textarea.autogrow").forEach(autoGrow);
+}
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.classList && e.target.classList.contains("autogrow")) autoGrow(e.target);
+});
+window.addEventListener("resize", autoGrowAll);
+/* 面板从隐藏变可见、或宽度变化时，宽度这时才是真的，补算一次 */
+if (typeof ResizeObserver !== "undefined") {
+  const _agRO = new ResizeObserver((entries) => {
+    entries.forEach(en => autoGrow(en.target));
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("textarea.autogrow").forEach(el => _agRO.observe(el));
+  });
 }
 
 function updateCardUI() {
@@ -2534,10 +2960,11 @@ function updateCardUI() {
   $('#displaySentPy').value = currentActiveWord.sentence_py;
   $('#displaySentEn').value = currentActiveWord.sentence_en;
   $('#displaySentNative').value = currentActiveWord.sentence_native || '';
+  autoGrowAll();   // 2026-09-03：内容换了要重算高度，否则还是按旧内容的高度显示
 
   const isCollected = currentVocabList.some(item => item.word === currentActiveWord.word);
   $('#btnCollect').classList.toggle('collected', isCollected);
-  $('#btnCollectText').textContent = isCollected ? "已在生词本" : "收藏到生词本";
+  $('#btnCollectText').textContent = isCollected ? "更新到生词本" : "收藏到生词本";
 
   updateHistoryStepperUI();
 }
@@ -2591,21 +3018,31 @@ function getFormattedSentence(item) {
 /* ================= 今日生词本操作 ================= */
 function renderVocabList() {
   const container = $('#vocabListContainer');
-  $('#vocabCount').textContent = currentVocabList.length;
+  const vis = visibleVocab();
+  const total = currentVocabList.length;
+  $('#vocabCount').textContent = (nbFilter === 'all' || vis.length === total) ? String(total) : `${vis.length} / ${total}`;
+  const name = currentStudent();
 
-  if (currentVocabList.length === 0) {
-    container.innerHTML = `
-      <div class="empty-tip" id="emptyTip">
-        暂无收藏生词<br>
-        在左侧查词后，点击<b>「收藏到生词本」</b><br>
-        下课后点击下方一键生成学生复习闪卡！
-      </div>`;
+  if (vis.length === 0) {
+    let tip;
+    if (!name) tip = `还没有学生<br>点顶栏「<b>＋</b>」添加一个学生<br>之后查过的词会自动进 ta 的生词本`;
+    else if (total && nbFilter === 'today') tip = `${currentLessonDate()} 这天还没加词<br>${escapeHtml(name)} 一共有 <b>${total}</b> 个词，切「<b>全部</b>」可见<br>在左侧查词，查过就自动收进来`;
+    else tip = `${escapeHtml(name)} 的生词本还是空的<br>在左侧查词，<b>查过就自动收进来</b><br>下课后点下方一键生成复习闪卡`;
+    container.innerHTML = `<div class="empty-tip" id="emptyTip">${tip}</div>`;
     return;
   }
 
-  container.innerHTML = currentVocabList.map((item, idx) => {
+  const rows = vis.map(item => ({ item, idx: currentVocabList.indexOf(item) }));
+  if (nbFilter === 'all') rows.sort((a, b) => (b.item.added || '').localeCompare(a.item.added || ''));
+  let lastDate = null;
+  container.innerHTML = rows.map(({ item, idx }) => {
+    let head = '';
+    if (nbFilter === 'all' && item.added !== lastDate) {
+      lastDate = item.added;
+      head = `<div class="nb-date-head">${escapeHtml(item.added || '未记日期')}</div>`;
+    }
     const dualDef = item.native_def ? `EN: ${item.english} | 二翻: ${item.native_def}` : item.english;
-    return `
+    return head + `
     <div class="vocab-item" data-idx="${idx}">
       <div class="vocab-item-main" onclick="loadWordFromList(${idx})">
         <div class="vocab-item-top">
@@ -2616,19 +3053,15 @@ function renderVocabList() {
         <div class="vocab-item-dual">${dualDef}</div>
       </div>
       <div class="vocab-item-actions">
-        <button class="audio-btn" onclick="speak('${item.word}')" title="发音">
+        <button class="audio-btn" onclick="speakVocabItem(${idx})" title="发音">
           <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
             <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
             <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
             <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
           </svg>
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="copyItem(${idx})" title="复制生词卡">
-          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:14px;height:14px">
-            <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
-            <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
-          </svg>
-        </button>
+        <button class="copy-list-btn" onclick="copyItemTranslation(${idx})" title="只复制翻译">译</button>
+        <button class="copy-list-btn" onclick="copyItemSentence(${idx})" title="只复制例句">句</button>
         <button class="btn btn-danger btn-sm" onclick="deleteItem(${idx})" title="删除" style="padding:4px 6px;">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </button>
@@ -2651,6 +3084,21 @@ function copyItem(idx) {
   copyToClipboard(getFormattedFull(item));
 }
 
+function copyItemTranslation(idx) {
+  const item = currentVocabList[idx];
+  if (!item) return;
+  copyToClipboard(getFormattedMinimal(item), "翻译已复制！");
+}
+
+function copyItemSentence(idx) {
+  const item = currentVocabList[idx];
+  if (!item || !item.sentence_zh) {
+    showToast("这条生词还没有例句");
+    return;
+  }
+  copyToClipboard(getFormattedSentence(item), "例句已复制！");
+}
+
 function deleteItem(idx) {
   currentVocabList.splice(idx, 1);
   saveList();
@@ -2659,7 +3107,8 @@ function deleteItem(idx) {
 
 /* ================= AI 随堂练习生成逻辑 ================= */
 async function triggerGenerateExercises() {
-  if (!currentVocabList.length) {
+  const exVocab = visibleVocab();   // 2026-09-06：按右栏当前「今天／全部」出题
+  if (!exVocab.length) {
     showToast("请先在左侧收藏一些生词再生成练习");
     return;
   }
@@ -2675,12 +3124,22 @@ async function triggerGenerateExercises() {
   const targetLang = $('#targetLangSelect').value;
 
   try {
-    const res = await fetch("http://127.0.0.1:8765/api/generate_exercises", {
+    const res = await fetch(`${API}/api/generate_exercises`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        words: currentVocabList,
-        target_lang: targetLang
+        words: exVocab,
+        target_lang: targetLang,
+        engine: $('#engineSelect').value,
+        /* 2026-09-03 加（小克，老师报「重新生成是假功能」）：原来每次发的请求一模一样，
+           模型自然出一模一样的题，点了看着像没反应。把上一轮题干和一个随机标记一起发下去。 */
+        /* 排重要按**真内容**：order/dialogue/collocation 的 question 是固定套话
+           （「请将下列词语按正确语序连成一句话：」），拿它去重等于没去重——
+           老师报「重新生成是假功能」就是这么来的。把 blocks/context/答案都拼进签名。 */
+        avoid_questions: (currentExercises || []).map(e => e && [
+          e.question, Array.isArray(e.blocks) ? e.blocks.join(' ') : '', e.context || '', e.answer || ''
+        ].filter(Boolean).join(' | ')).filter(Boolean),
+        nonce: Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
       })
     });
     const data = await res.json();
@@ -2701,13 +3160,13 @@ async function triggerGenerateExercises() {
       renderExercises(currentExercises);
       showToast(`✨ AI 随堂练习生成完毕 (共 ${exs.length} 道多题型练习)`);
     } else {
-      currentExercises = generateOfflineExercises(currentVocabList);
+      currentExercises = generateOfflineExercises(exVocab);
       renderExercises(currentExercises);
       showToast("已切换到高质量离线题库");
     }
   } catch(e) {
     loading.style.display = 'none';
-    currentExercises = generateOfflineExercises(currentVocabList);
+    currentExercises = generateOfflineExercises(exVocab);
     renderExercises(currentExercises);
   }
 }
@@ -2720,8 +3179,14 @@ function generateOfflineExercises(vocabList) {
     let qPy = "";
 
     if (rawSent.includes(item.word)) {
-      qZh = rawSent.replace(item.word, "（____）");
-      qPy = (item.sentence_py || "").replace(item.pinyin, "（____）");
+      qZh = rawSent.split(item.word).join("（____）");   // 所有出现处都挖掉，不只第一处
+      /* 2026-09-03 改（小克，K525 第 10 条）：拼音行原来是
+         (item.sentence_py||"").replace(item.pinyin, "（____）")——声调、大小写、分词
+         只要有一点对不上就替换不上，于是**拼音行把答案完整拼出来**。
+         替换不成功就整行留空：宁可不给拼音，也不能泄答案。 */
+      const rawPy = item.sentence_py || "";
+      const pyMasked = item.pinyin ? rawPy.split(item.pinyin).join("（____）") : rawPy;
+      qPy = (item.pinyin && pyMasked !== rawPy) ? pyMasked : "";
     } else {
       // 备选多样化口语句式
       const patterns = [
@@ -2742,45 +3207,106 @@ function generateOfflineExercises(vocabList) {
       question: qZh,
       pinyin: qPy,
       translation: item.sentence_en || "Choose the best word to complete the sentence.",
-      options: shuffleArray([...words]),
+      /* 2026-09-03 改（小克）：原来是 shuffleArray([...words])——用生词本里**全部**的词当选项，
+         收藏 20 个词就出 20 个按钮。改成正确项 + 最多 3 个干扰项。 */
+      options: shuffleArray([item.word, ...shuffleArray(words.filter(w => w !== item.word)).slice(0, 3)]),
       answer: item.word,
       explanation: `语境考查词语“${item.word}”（${item.english || item.pinyin}）的精准用法。`
     };
   });
 }
 
+/* 2026-09-03 改（小克，K525 第 10 条）：原来是 arr.sort(() => Math.random() - 0.5)，
+   这是有偏洗牌（正确项落在哪个位置分布不均，学生能猜出规律），而且 sort 会就地改原数组。
+   换成 Fisher–Yates，并且返回副本不动入参。 */
 function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function renderExercises(exercises) {
   const container = $('#exerciseListContainer');
   $('#exerciseCountBadge').textContent = `共 ${exercises.length} 道题`;
 
-  container.innerHTML = exercises.map((ex, idx) => `
+  /* ⚠️ 2026-09-03 重写（小克，老师报「出题质量极差」）：真因不全在模型，
+     **后端出 4 种题型，前端只会渲染 1 种**。order 的 blocks、dialogue 的 context、
+     collocation 的目标词，模板里一个都没渲染——于是学生看到的是
+     「请将下列词语按正确语序连成一句话：」后面什么都没有、
+     「请用指定生词回答 A：」没有 A 说的话，纯套话。这里把三种都补上。
+     另外 order 题的 pinyin 是**正确答案整句的拼音**，摆在题面上等于直接给答案，
+     挪到「参考答案」折叠里。 */
+  container.innerHTML = exercises.map((ex, idx) => {
+    const isOrder = ex.type === 'order' || (Array.isArray(ex.blocks) && ex.blocks.length);
+    const opts = Array.isArray(ex.options) ? ex.options : [];
+
+    // 题面拼音：order 题会泄答案，不显示在题面
+    const facePy = isOrder ? '' : (ex.pinyin || '');
+
+    let bodyExtra = '';
+    if (isOrder) {
+      bodyExtra += `<div class="exercise-blocks">` +
+        ex.blocks.map(b => `<span class="block-chip">${escHtml(b)}</span>`).join('') +
+        `</div>`;
+    }
+    if (ex.context) {
+      bodyExtra += `<div class="exercise-context"><b>A：</b>${escHtml(ex.context)}</div>`;
+    }
+    if (ex.targetWord || ex.target_word) {
+      bodyExtra += `<div class="exercise-target">目标生词：<b>${escHtml(ex.targetWord || ex.target_word)}</b></div>`;
+    }
+
+    const optionsHtml = opts.length
+      ? `<div class="exercise-options">` + opts.map((opt, oi) =>
+          `<button class="option-btn" onclick="checkAnswer(${idx}, ${oi}, this)">${escHtml(opt)}</button>`
+        ).join('') + `</div>`
+      : '';
+
+    const answerExtra = isOrder && ex.pinyin
+      ? `<div style="color:var(--ink-soft);font-size:12px;margin-top:2px;">${escHtml(ex.pinyin)}</div>` : '';
+
+    return `
     <div class="exercise-card" id="exCard_${idx}">
-      <div class="exercise-q">${idx + 1}. ${ex.question}</div>
-      <div class="exercise-py">${ex.pinyin}</div>
-      <div class="exercise-trans">${ex.translation}</div>
-      <div class="exercise-options">
-        ${ex.options.map(opt => `
-          <button class="option-btn" onclick="checkAnswer(${idx}, '${opt}', '${ex.answer}', this)">${opt}</button>
-        `).join("")}
-      </div>
+      <div class="exercise-q">${idx + 1}. ${ex.typeName ? `<span class="ex-type">${escHtml(ex.typeName)}</span> ` : ''}${escHtml(ex.question)}</div>
+      ${facePy ? `<div class="exercise-py">${escHtml(facePy)}</div>` : ''}
+      ${ex.translation ? `<div class="exercise-trans">${escHtml(ex.translation)}</div>` : ''}
+      ${bodyExtra}
+      ${optionsHtml}
       <div class="exercise-answer-box" id="exAnswer_${idx}">
-        <b>参考答案：</b>${ex.answer}
-        <div style="color:var(--ink-soft);font-size:12px;margin-top:2px;">${ex.explanation || ''}</div>
+        <b>参考答案：</b>${escHtml(ex.answer || '')}
+        ${answerExtra}
+        <div style="color:var(--ink-soft);font-size:12px;margin-top:2px;">${escHtml(ex.explanation || '')}</div>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
 }
 
-function checkAnswer(idx, chosen, answer, btnEl) {
+/* 2026-09-03 改（小克，K525 第 14 条）：原来是
+   onclick="checkAnswer(${idx}, '${opt}', '${ex.answer}', this)"——把模型输出拼进单引号 JS 字符串。
+   外语选项只要带一个撇号（l'école、d'accord）整个 onclick 就是语法错，按钮点了没反应。
+   改成只传下标，值一律从 currentExercises 取。 */
+function speakVocabItem(idx) {
+  const item = currentVocabList[idx];
+  if (item && item.word) speak(item.word);
+}
+function escHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function checkAnswer(idx, optIndex, btnEl) {
+  const ex = currentExercises[idx];
+  if (!ex) return;
+  const answer = ex.answer;
+  const chosen = (ex.options || [])[optIndex];
   const card = document.getElementById(`exCard_${idx}`);
   const allBtns = card.querySelectorAll('.option-btn');
-  allBtns.forEach(b => {
+  allBtns.forEach((b, bi) => {
     b.classList.remove('correct', 'wrong');
-    if (b.textContent === answer) b.classList.add('correct');
+    if ((ex.options || [])[bi] === answer) b.classList.add('correct');
   });
   if (chosen === answer) {
     showToast("回答正确！");
@@ -2825,8 +3351,16 @@ function generateStudentFlashcardHtml() {
   const student = $('#studentName').value.trim() || 'Student';
   const date = $('#lessonDate').value.trim() || todayStr;
   const targetLang = $('#targetLangSelect').value;
-  const cardsDataJson = JSON.stringify(currentVocabList).replace(/</g, "\u003c");
-  const exercisesJson = JSON.stringify(currentExercises).replace(/</g, "\u003c");
+  /* ⚠️ 2026-09-03 修（小克）：原来写的是 .replace(/</g, "\u003c")——在 JS 里 "\u003c" 就是 "<" 本身，
+     等于把 < 换成 <，**完全没转义**。实测：释义里只要出现一个闭合的 script 标签，
+     导出的闪卡文件就在那儿断掉、整页散架。必须写成 "\\u003c"（反斜杠+u003c 六个字符）。
+     （这段注释本身也不能写字面量的闭合 script 标签——HTML 解析器不认注释，
+       2026-09-03 小克就是这么把页面写坏过一次的。） */
+  const escJsonForScript = (v) => JSON.stringify(v)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  const cardsDataJson = escJsonForScript(visibleVocab());
+  const exercisesJson = escJsonForScript(currentExercises);
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -3491,10 +4025,16 @@ renderCurrentCard();
 }
 
 /* ================= 页面主交互逻辑与绑定 ================= */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initLangPicker();
-  checkServer();
-  loadSavedList();
+  /* 2026-09-06 改（小克，K623）：先等探活结果再拉学生名单和本子，否则第一次总是当离线处理，
+     服务端里的名单和迁移来的旧生词永远拉不到。 */
+  await checkServer();
+  /* 2026-09-03 加（小克）：checkServer 原来只在开页时跑一次。服务中途挂了
+     isServerOnline 会一直是 true，TTS 和 AI 全部静默失败。30 秒探一次。 */
+  setInterval(checkServer, 30000);
+  await initStudents();
+  await loadSavedList();
 
   // 1. 语言与引擎切换
   $('#targetLangSelect').addEventListener('change', () => {
@@ -3546,11 +4086,11 @@ document.addEventListener('DOMContentLoaded', () => {
     syncActiveWordFromUI();
     const idx = currentVocabList.findIndex(item => item.word === currentActiveWord.word);
     if (idx >= 0) {
-      currentVocabList[idx] = { ...currentActiveWord };
+      currentVocabList[idx] = { ...currentVocabList[idx], ...currentActiveWord };   // 保住 added 日期
       showToast(`已更新生词本中的【${currentActiveWord.word}】`);
     } else {
-      currentVocabList.push({ ...currentActiveWord });
-      showToast(`已收藏【${currentActiveWord.word}】到今日生词本！`);
+      currentVocabList.push({ ...currentActiveWord, added: currentLessonDate() });
+      showToast(`已收藏【${currentActiveWord.word}】到 ${currentStudent() || '默认'} 的生词本`);
     }
     saveList();
     updateCardUI();
@@ -3558,19 +4098,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 8. 清空生词本
   $('#btnClearList').addEventListener('click', () => {
-    if (!currentVocabList.length) return;
-    if (confirm("确定要清空今日收藏的生词吗？")) {
-      currentVocabList = [];
+    const vis = visibleVocab();
+    if (!vis.length) return;
+    const scope = nbFilter === 'all'
+      ? `${currentStudent()} 的全部 ${vis.length} 个生词`
+      : `${currentLessonDate()} 这天的 ${vis.length} 个生词`;
+    if (confirm(`确定清空${scope}吗？`)) {
+      const gone = new Set(vis);
+      currentVocabList = currentVocabList.filter(it => !gone.has(it));
       currentExercises = [];
       saveList();
-      showToast("生词本已清空");
+      showToast("已清空");
       updateCardUI();
     }
   });
 
-  // 9. 学生名字与日期更改
-  $('#studentName').addEventListener('change', loadSavedList);
-  $('#lessonDate').addEventListener('change', loadSavedList);
+  // 9. 学生切换 / 增删、日期、筛选、搜过即收开关（2026-09-06 K623）
+  $('#studentSelect').addEventListener('change', e => switchStudent(e.target.value));
+  $('#lessonDate').addEventListener('change', () => { renderVocabList(); updateCardUI(); });
+  $('#btnAddStudent').addEventListener('click', openStudentModal);
+  $('#btnDeleteStudent').addEventListener('click', deleteCurrentStudent);
+  $('#btnCloseStudentModal').addEventListener('click', () => $('#studentModal').classList.remove('active'));
+  $('#btnCancelStudentModal').addEventListener('click', () => $('#studentModal').classList.remove('active'));
+  $('#studentModal').addEventListener('click', e => { if (e.target === $('#studentModal')) $('#studentModal').classList.remove('active'); });
+  $('#btnConfirmAddStudent').addEventListener('click', async () => {
+    if (await addStudent($('#inputNewStudentName').value)) $('#studentModal').classList.remove('active');
+  });
+  $('#inputNewStudentName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnConfirmAddStudent').click(); });
+  $('#nbFilter').addEventListener('click', e => {
+    const b = e.target.closest('.nb-filter-btn');
+    if (!b) return;
+    nbFilter = b.dataset.f;
+    try { localStorage.setItem('cilai_nb_filter', nbFilter); } catch(e2) {}
+    document.querySelectorAll('#nbFilter .nb-filter-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderVocabList();
+  });
+  $('#autoCollectToggle').checked = autoCollectOn();
+  $('#autoCollectToggle').addEventListener('change', e => {
+    try { localStorage.setItem('cilai_auto_collect', e.target.checked ? '1' : '0'); } catch(e2) {}
+    showToast(e.target.checked ? '搜过即收已开：查到的词自动进生词本' : '搜过即收已关：要手动点「收藏」');
+  });
+  document.querySelectorAll('#nbFilter .nb-filter-btn').forEach(x => x.classList.toggle('active', x.dataset.f === nbFilter));
 
   // 10. AI 一键生成随堂练习
   $('#btnOpenExerciseModal').addEventListener('click', triggerGenerateExercises);
@@ -3614,7 +4182,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 11. 课后导出中心模态框
   $('#btnOpenExportModal').addEventListener('click', () => {
-    if (!currentVocabList.length) {
+    if (!visibleVocab().length) {
       showToast("请先在左侧收藏一些生词再导出闪卡");
       return;
     }
@@ -3632,20 +4200,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  /* 2026-09-03 重写（小克，老师报「一键导出 HTML 是假功能」）：
+     原来是 <a download> + blob，而且 URL.revokeObjectURL 紧跟在 a.click() 后面
+     ——Chromium 读 blob 是异步的，同步撤销经常把下载掐死；Electron 里更是看不到
+     文件落在哪，界面却照样弹「已下载」。
+     现在：Electron 走主进程 saveFile（弹保存框、真写盘、回传真实路径，提示里报路径）；
+     纯浏览器退回 blob，但把 a 挂进 DOM 再点，撤销延后到 60 秒。 */
+  async function saveTextFile(filename, content, mime) {
+    if (window.electronAPI && typeof window.electronAPI.saveFile === "function") {
+      const r = await window.electronAPI.saveFile(filename, content);
+      if (r && r.ok) {
+        showToast(`已保存：${r.path}（${(r.size / 1024).toFixed(0)} KB）`);
+        return true;
+      }
+      if (r && r.canceled) { showToast("已取消保存"); return false; }
+      showToast(`保存失败：${(r && r.error) || "未知原因"}`);
+      return false;
+    }
+    try {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      showToast(`已下载：${filename}`);
+      return true;
+    } catch (e) {
+      showToast(`下载失败：${e.message || e}`);
+      return false;
+    }
+  }
+
   // 12. 导出单文件复习网页 HTML
-  $('#btnDownloadHtmlCard').addEventListener('click', () => {
-    if (!currentVocabList.length) return;
-    const htmlContent = generateStudentFlashcardHtml();
+  $('#btnDownloadHtmlCard').addEventListener('click', async () => {
+    if (!visibleVocab().length) { showToast("生词本是空的，先收藏几个词"); return; }
     const student = $('#studentName').value.trim() || 'Student';
     const date = $('#lessonDate').value.trim() || todayStr;
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `词来_${student}_${date}_生词复习闪卡.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast(`已下载：词来_${student}_${date}_生词复习闪卡.html`);
+    await saveTextFile(`词来_${student}_${date}_生词复习闪卡.html`,
+                       generateStudentFlashcardHtml(), 'text/html;charset=utf-8');
   });
 
   // 13. 复制课后总结消息 (双语对照)
@@ -3656,7 +4251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasSecond = (lang !== '英语');
 
     let lines = [`Hi ${student}!`, `Great job in today's Chinese lesson (${date})! Here is your vocabulary review:\n`];
-    currentVocabList.forEach((item, i) => {
+    visibleVocab().forEach((item, i) => {
       lines.push(`${i+1}. ${item.word} [${item.pinyin}]`);
       lines.push(`   EN: ${item.english}`);
       if (hasSecond && item.native_def) {
@@ -3679,7 +4274,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   $('#btnCopySummary').addEventListener('click', () => {
-    if (!currentVocabList.length) {
+    if (!visibleVocab().length) {
       showToast("当前生词本为空");
       return;
     }
@@ -3691,24 +4286,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 14. 导出 Anki / Quizlet CSV
-  $('#btnExportCsv').addEventListener('click', () => {
-    if (!currentVocabList.length) return;
+  $('#btnExportCsv').addEventListener('click', async () => {
+    if (!visibleVocab().length) return;
     let csv = "Front\tPinyin\tBack\n";
-    currentVocabList.forEach(item => {
+    visibleVocab().forEach(item => {
       let back = `<b>EN:</b> ${item.english}`;
       if (item.native_def) back += `<br><b>二翻:</b> ${item.native_def}`;
       back += `<br><br><b>例句：</b>${item.sentence_zh}<br><i>${item.sentence_py}</i><br>EN: ${item.sentence_en}`;
       if (item.sentence_native) back += `<br>二翻: ${item.sentence_native}`;
       csv += `${item.word}\t${item.pinyin}\t"${back.replace(/"/g, '""')}"\n`;
     });
-    const blob = new Blob([csv], { type: 'text/tab-separated-values;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `词来_${$('#studentName').value.trim() || 'vocab'}_anki.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast("已导出 Anki / Quizlet 格式文件");
+    // 2026-09-03（小克）：跟 HTML 导出同一个毛病，一起走真的存文件
+    await saveTextFile(`词来_${$('#studentName').value.trim() || 'vocab'}_anki.txt`,
+                       csv, 'text/tab-separated-values;charset=utf-8');
   });
 
   // 15. 深色模式切换
@@ -3757,6 +4347,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // 18. 设置弹窗逻辑
   $('#btnSettings').addEventListener('click', () => {
+    $('#inputDeepseekKey').value = localStorage.getItem('cilai_deepseek_key') || '';
     $('#inputDashscopeKey').value = localStorage.getItem('cilai_dashscope_key') || '';
     $('#inputGeminiKey').value = localStorage.getItem('cilai_gemini_key') || '';
     $('#inputVolcKey').value = localStorage.getItem('cilai_volc_key') || '';
@@ -3771,19 +4362,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   $('#btnSaveSettings').addEventListener('click', async () => {
+    const deepseek = $('#inputDeepseekKey').value.trim();
     const qwen = $('#inputDashscopeKey').value.trim();
     const gemini = $('#inputGeminiKey').value.trim();
     const volc = $('#inputVolcKey').value.trim();
 
+    localStorage.setItem('cilai_deepseek_key', deepseek);
     localStorage.setItem('cilai_dashscope_key', qwen);
     localStorage.setItem('cilai_gemini_key', gemini);
     localStorage.setItem('cilai_volc_key', volc);
 
     try {
-      await fetch("http://127.0.0.1:8765/api/save_keys", {
+      await fetch(`${API}/api/save_keys`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dashscope_key: qwen, gemini_key: gemini, volc_key: volc })
+        body: JSON.stringify({ deepseek_key: deepseek, dashscope_key: qwen, gemini_key: gemini, volc_key: volc })
       });
     } catch(e) {}
 
@@ -3792,7 +4385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkServer();
   });
 
-  lookupWord("顺便");
+  lookupWord("顺便", { noCollect: true });   // 开页演示词，不进任何人的本子
 });
 </script>
 </body>

@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, Menu, shell } = require('electron');
+const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 const { spawn } = require('node:child_process');
@@ -124,6 +124,31 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+/* 2026-09-03 加（小克）：真正把文件写到盘上，并把路径回传给界面。
+   老师点「一键下载网页」原来只是 <a download> + blob，Electron 里看不到文件落在哪，
+   界面却弹「已下载」——这就是假功能。现在：弹保存框 → 真写 → 回传真实路径。 */
+ipcMain.handle('cilai:save-file', async (_evt, { name, content }) => {
+  try {
+    const defaultPath = path.join(app.getPath('downloads'), String(name || 'cilai-export'));
+    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+      title: '保存到哪里',
+      defaultPath,
+      buttonLabel: '保存'
+    });
+    if (canceled || !filePath) return { ok: false, canceled: true };
+    fs.writeFileSync(filePath, content, 'utf-8');
+    const size = fs.statSync(filePath).size;
+    return { ok: true, path: filePath, size };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message ? e.message : e) };
+  }
+});
+
+ipcMain.handle('cilai:show-in-folder', async (_evt, filePath) => {
+  try { shell.showItemInFolder(String(filePath)); return { ok: true }; }
+  catch (e) { return { ok: false, error: String(e) }; }
+});
 
 app.whenReady().then(() => {
   startPythonServer();
