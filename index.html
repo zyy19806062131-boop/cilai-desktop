@@ -1703,10 +1703,10 @@ main {
           <span>AI 一键生成随堂练习</span>
         </button>
 
-        <!-- 课后生成闪卡按钮 -->
+        <!-- 课后导出复习图按钮 -->
         <button class="generate-card-btn" id="btnOpenExportModal">
           <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡" onerror="this.style.display='none'">
-          <span>下课后一键生成闪卡</span>
+          <span>下课后一键导出复习图</span>
         </button>
 
         <button class="btn btn-secondary" id="btnCopySummary">
@@ -1732,7 +1732,7 @@ main {
     </div>
     <div class="modal-body">
       <div class="field-group">
-        <label class="field-label" style="font-size:13px;"><span>学生名字（生词本和闪卡文件都按它命名）</span></label>
+        <label class="field-label" style="font-size:13px;"><span>学生名字（生词本和导出的图都按它命名）</span></label>
         <input type="text" id="inputNewStudentName" class="editable-field" placeholder="例如 Mike" autocomplete="off" maxlength="40">
       </div>
       <div style="font-size:12.5px;color:var(--ink-soft);line-height:1.6;">
@@ -1758,7 +1758,7 @@ main {
     </div>
     <div class="modal-body">
       <div style="font-size:13px;color:var(--ink-soft);line-height:1.6;background:var(--panel-alt);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);">
-        💡 <b>小白开箱即用说明</b>：不填任何 Key 也完全不影响使用！「词来」自带 19.8 万离线词库、拼音、离线生活例句、一键复制与课后闪卡导出。<br>
+        💡 <b>小白开箱即用说明</b>：不填任何 Key 也完全不影响使用！「词来」自带 19.8 万离线词库、拼音、离线生活例句、一键复制与课后复习图导出。<br>
         如果您需要启用<b>DeepSeek 高质量智能出题</b>、<b>通义千问极速出题</b>或<b>豆包超拟人发音</b>，可在此保存您的专属 Key（保存在本机，绝不上云）。
       </div>
 
@@ -1825,11 +1825,11 @@ main {
     </div>
     <div class="modal-header" style="background:var(--panel-alt);border-top:1px solid var(--line);border-bottom:none;padding:12px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" id="btnCopyExercisesStudent">
-          <span>📋 复制做题版 (发学生做题)</span>
+        <button class="btn btn-primary btn-sm" id="btnExportPracticeStudent">
+          <span>🖼 导出学生做题图 (不含答案)</span>
         </button>
-        <button class="btn btn-secondary btn-sm" id="btnCopyExercisesFull">
-          <span>📋 复制题目+解析 (备课版)</span>
+        <button class="btn btn-secondary btn-sm" id="btnExportPracticeAnswer">
+          <span>🖼 导出答案解析图</span>
         </button>
         <button class="btn btn-secondary btn-sm" id="btnToggleAnswers">
           <span>显示/隐藏参考答案</span>
@@ -1848,7 +1848,7 @@ main {
     <div class="modal-header">
       <h3>
         <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡">
-        <span>课后闪卡与复习资料导出中心</span>
+        <span>课后复习资料导出（图片）</span>
       </h3>
       <button class="btn btn-secondary btn-sm" id="btnCloseModal" style="padding:4px 8px;border-radius:50%;">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1 L11 11 M11 1 L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -1863,11 +1863,11 @@ main {
               <rect x="7" y="8" width="28" height="34" rx="7" fill="#ffffff" stroke="#e3dcd3" stroke-width="1.5"/>
               <circle cx="21" cy="21" r="3.5" fill="#c25220"/>
             </svg>
-            <span>导出学生专属互动复习网页 (.html)</span>
+            <span>导出生词复习长图 (.png)</span>
           </div>
-          <div class="export-option-desc">生成单文件离线网页（包含英文必备与母语二翻双语对照，内置互动随堂练习题），学生双击即可玩 3D 翻牌、听发音、刷题自测！</div>
+          <div class="export-option-desc">整节课生词画成一张长图：中文、拼音、英文释义、母语二翻、例句。存好直接发给学生。</div>
         </div>
-        <button class="btn btn-primary" id="btnDownloadHtmlCard">一键下载网页</button>
+        <button class="btn btn-primary" id="btnExportVocabImage">导出长图</button>
       </div>
 
       <div class="export-option-card">
@@ -1882,20 +1882,6 @@ main {
           <div class="export-option-desc">格式化整节课生词与例句（英文+二翻对照），排版整洁，直接在聊天窗口中粘贴发送。</div>
         </div>
         <button class="btn btn-secondary" id="btnCopySummaryMessage">一键复制消息</button>
-      </div>
-
-      <div class="export-option-card">
-        <div class="export-option-info">
-          <div class="export-option-title">
-            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-              <path d="M10 32 L10 40 L38 40 L38 32" stroke="#c25220" stroke-width="4" stroke-linecap="round"/>
-              <path d="M24 8 L24 28 M16 20 L24 28 L32 20" stroke="#c25220" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>导出 Anki / Quizlet 格式 (CSV)</span>
-          </div>
-          <div class="export-option-desc">标准制表符分隔格式，包含中英与母语多维度字段，方便学生导入 Anki。</div>
-        </div>
-        <button class="btn btn-secondary" id="btnExportCsv">导出 CSV</button>
       </div>
 
       <div class="field-group" style="margin-top:6px;">
@@ -3027,7 +3013,7 @@ function renderVocabList() {
     let tip;
     if (!name) tip = `还没有学生<br>点顶栏「<b>＋</b>」添加一个学生<br>之后查过的词会自动进 ta 的生词本`;
     else if (total && nbFilter === 'today') tip = `${currentLessonDate()} 这天还没加词<br>${escapeHtml(name)} 一共有 <b>${total}</b> 个词，切「<b>全部</b>」可见<br>在左侧查词，查过就自动收进来`;
-    else tip = `${escapeHtml(name)} 的生词本还是空的<br>在左侧查词，<b>查过就自动收进来</b><br>下课后点下方一键生成复习闪卡`;
+    else tip = `${escapeHtml(name)} 的生词本还是空的<br>在左侧查词，<b>查过就自动收进来</b><br>下课后点下方一键导出复习图`;
     container.innerHTML = `<div class="empty-tip" id="emptyTip">${tip}</div>`;
     return;
   }
@@ -3317,711 +3303,331 @@ function checkAnswer(idx, optIndex, btnEl) {
   document.getElementById(`exAnswer_${idx}`).classList.add('show');
 }
 
-function getExercisesStudentText() {
-  if (!currentExercises.length) return "";
-  const student = $('#studentName').value.trim() || 'Student';
-  let lines = [`今日随堂练习 / Practice Exercises (${student}):\n`];
-  currentExercises.forEach((ex, i) => {
-    lines.push(`${i+1}. ${ex.question}`);
-    lines.push(`   [${ex.pinyin}]`);
-    lines.push(`   选项: [ ${ex.options.join(' / ')} ]`);
-    lines.push('');
+/* ================= 课后导出图片（练习题图 + 生词复习长图） =================
+   2026-09-28 改（小克，老师：「出题和生成直接导出图片，不要 HTML 或者 Anki 闪卡，像小程序那样」）：
+   原来的「单文件复习网页 .html」和「Anki CSV」都拆掉了，画法照搬小程序
+   （工具/词来小程序/pages/practice、pages/flashcards 的长图），750 宽、2 倍出图、PNG 存盘。 */
+const POSTER_SANS = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+const POSTER_SERIF = '"Songti SC", "STSong", "Noto Serif SC", serif';
+function pf(spec, serif) { return `${spec} ${serif ? POSTER_SERIF : POSTER_SANS}`; }
+
+function posterRoundedRect(ctx, x, y, width, height, radius, fillStyle, strokeStyle) {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
+  if (fillStyle) { ctx.fillStyle = fillStyle; ctx.fill(); }
+  if (strokeStyle) { ctx.strokeStyle = strokeStyle; ctx.lineWidth = 2; ctx.stroke(); }
+}
+
+// 折行：拉丁词、数字和空位（____）整块不劈开，汉字逐字折；收尾标点不打头；超行数末行以「…」结尾。
+function posterWrapLines(ctx, text, maxWidth, maxLines) {
+  const content = String(text || '').trim();
+  if (!content) return [];
+  const units = content.match(/[（(【「“"¿¡]*[A-Za-z0-9_À-ɏЀ-ӿ'’\-]+[)）】」”".,;:!?…]*|\s+|[\s\S]/g) || [];
+  const lines = [];
+  let line = '';
+  let truncated = false;
+  for (let i = 0; i < units.length && !truncated; i += 1) {
+    const unit = units[i];
+    const pieces = ctx.measureText(unit).width > maxWidth ? unit.split('') : [unit];
+    for (let j = 0; j < pieces.length; j += 1) {
+      const piece = pieces[j];
+      if (!line && /^\s+$/.test(piece)) continue;
+      if (line && /^[，。？！、；：）】」”’,.?!;:)]$/.test(piece)) { line += piece; continue; }
+      if (line && ctx.measureText(line + piece).width > maxWidth) {
+        if (lines.length >= maxLines - 1) { truncated = true; break; }
+        lines.push(line.replace(/\s+$/, ''));
+        line = '';
+        if (/^\s+$/.test(piece)) continue;
+      }
+      line += piece;
+    }
+  }
+  if (line) lines.push(line.replace(/\s+$/, ''));
+  if (truncated && lines.length) {
+    const last = lines[lines.length - 1];
+    lines[lines.length - 1] = `${last.slice(0, Math.max(1, last.length - 1))}…`;
+  }
+  return lines;
+}
+
+function posterText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const lines = posterWrapLines(ctx, text, maxWidth, maxLines);
+  lines.forEach((line, i) => ctx.fillText(line, x, y + i * lineHeight));
+  return y + lines.length * lineHeight;
+}
+
+function posterFrame(ctx, height, title, subtitle, tagline, taglineColor) {
+  ctx.fillStyle = '#f6f3ee';
+  ctx.fillRect(0, 0, 750, height);
+  posterRoundedRect(ctx, 24, 24, 702, height - 48, 28, '#ffffff', '#e6dfd5');
+  ctx.fillStyle = '#c26538';
+  ctx.fillRect(24, 24, 702, 14);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#c26538';
+  ctx.font = pf('800 25px');
+  ctx.fillText(title, 62, 68);
+  ctx.fillStyle = '#8e847a';
+  ctx.font = pf('22px');
+  ctx.fillText(subtitle, 62, 106);
+  ctx.fillStyle = taglineColor || '#b5aba0';
+  ctx.font = pf('800 20px');
+  ctx.fillText(tagline, 62, 144);
+}
+
+function posterFooter(ctx, height, note) {
+  ctx.fillStyle = '#b5aba0';
+  ctx.font = pf('20px');
+  ctx.fillText(note, 62, height - 70);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#c26538';
+  ctx.font = pf('800 20px');
+  ctx.fillText('词来', 688, height - 70);
+  ctx.textAlign = 'left';
+}
+
+function posterDivider(ctx, y) {
+  ctx.strokeStyle = '#eee7de';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(62, y);
+  ctx.lineTo(688, y);
+  ctx.stroke();
+}
+
+// 学生版不许露答案：拼音/提示里含答案原文就不画；连词成句的拼音就是答案整句，一律不画。
+function practiceFieldVisible(ex, field, includeAnswers) {
+  const value = ex[field];
+  if (!value) return false;
+  if (includeAnswers) return true;
+  const isOrder = ex.type === 'order' || (Array.isArray(ex.blocks) && ex.blocks.length);
+  if (isOrder && (field === 'pinyin' || field === 'translation')) return false;
+  const answer = String(ex.answer || '').replace(/[。？！，、；：“”‘’"']/g, '').trim();
+  return !answer || String(value).indexOf(answer) < 0;
+}
+
+function drawPracticeField(ctx, label, value, y, o) {
+  if (!value) return y;
+  ctx.fillStyle = o.labelColor || '#c26538';
+  ctx.font = pf('800 17px');
+  ctx.fillText(label, 62, y);
+  ctx.fillStyle = o.valueColor || '#2f2925';
+  ctx.font = o.valueFont || pf('700 25px');
+  return posterText(ctx, value, 62, y + 26, 626, o.lineHeight || 34, o.maxLines || 6) + 14;
+}
+
+// 带底色的框：先量行数再画框，框高跟着真实折行走。
+function drawPosterBox(ctx, y, box, parts) {
+  parts.forEach(p => { ctx.font = p.font; p.lines = posterWrapLines(ctx, p.text, 598, p.maxLines || 5); });
+  const bodyHeight = parts.reduce((t, p) => t + (p.gap || 0) + p.lines.length * p.lineHeight, 0);
+  const boxHeight = 38 + bodyHeight + 22;
+  posterRoundedRect(ctx, 54, y - 8, 642, boxHeight, 16, box.fill, box.stroke);
+  ctx.fillStyle = box.labelColor;
+  ctx.font = pf('800 17px');
+  ctx.fillText(box.label, 76, y + 8);
+  let yy = y + 36;
+  parts.forEach(p => {
+    yy += p.gap || 0;
+    ctx.font = p.font;
+    ctx.fillStyle = p.color;
+    p.lines.forEach((line, i) => ctx.fillText(line, 76, yy + i * p.lineHeight));
+    yy += p.lines.length * p.lineHeight;
   });
-  return lines.join('\n');
+  return y - 8 + boxHeight + 22;
 }
 
-function getExercisesFullText() {
-  if (!currentExercises.length) return "";
-  const student = $('#studentName').value.trim() || 'Student';
-  let lines = [`随堂练习（题目+参考答案及解析）- ${student}:\n`];
-  currentExercises.forEach((ex, i) => {
-    lines.push(`${i+1}. ${ex.question}`);
-    lines.push(`   [${ex.pinyin}]`);
-    lines.push(`   提示: ${ex.translation}`);
-    lines.push(`   选项: [ ${ex.options.join(' / ')} ]`);
-    lines.push(`   ★ 答案: ${ex.answer}`);
-    if (ex.explanation) lines.push(`   ★ 解析: ${ex.explanation}`);
-    lines.push('');
+function drawPracticePoster(ctx, list, meta, height) {
+  const includeAnswers = meta.variant === 'answer';
+  posterFrame(ctx, height, '词来 · 随堂练习',
+    `${meta.student} · ${meta.date} · ${list.length} 题`,
+    includeAnswers ? '答案解析图 · 含参考答案与教学解析' : '学生做题图 · 不含答案',
+    includeAnswers ? '#2b6a51' : '#b5aba0');
+
+  let y = 204;
+  list.forEach((ex, index) => {
+    if (index > 0) { posterDivider(ctx, y - 18); y += 28; }
+    ctx.fillStyle = '#c26538';
+    ctx.font = pf('800 21px');
+    ctx.fillText(String(index + 1).padStart(2, '0'), 62, y + 4);
+    ctx.fillStyle = '#2f2925';
+    ctx.font = pf('800 25px');
+    ctx.fillText(ex.typeName || '练习题', 118, y);
+    y += 48;
+
+    if (ex.context) {
+      y = drawPosterBox(ctx, y, { label: '情境', fill: '#f8f3eb', stroke: '#e6dfd5', labelColor: '#8e847a' },
+        [{ text: ex.context, font: pf('700 24px'), color: '#3c342e', lineHeight: 32 }]);
+    }
+    y = drawPracticeField(ctx, '题目', ex.question, y, { valueFont: pf('800 27px'), lineHeight: 38 });
+    const target = ex.targetWord || ex.target_word;
+    if (target) y = drawPracticeField(ctx, '目标生词', target, y, { valueFont: pf('800 25px') });
+    if (Array.isArray(ex.blocks) && ex.blocks.length) {
+      y = drawPracticeField(ctx, '词块', ex.blocks.join('  /  '), y, { valueFont: pf('700 25px'), maxLines: 5 });
+    }
+    if (practiceFieldVisible(ex, 'pinyin', includeAnswers)) {
+      y = drawPracticeField(ctx, '拼音', ex.pinyin, y, {
+        labelColor: '#8e847a', valueColor: '#8e847a', valueFont: pf('22px'), lineHeight: 30, maxLines: 4 });
+    }
+    if (practiceFieldVisible(ex, 'translation', includeAnswers)) {
+      y = drawPracticeField(ctx, '提示', ex.translation, y, {
+        labelColor: '#596b87', valueColor: '#596b87', valueFont: pf('22px'), lineHeight: 32, maxLines: 5 });
+    }
+    if (Array.isArray(ex.options) && ex.options.length) {
+      const opts = ex.options.map((o, i) => `${'ABCDEF'[i] || i + 1}. ${o}`).join('    ');
+      y = drawPracticeField(ctx, '选项', opts, y, { valueFont: pf('700 25px'), maxLines: 5 });
+    }
+    if (includeAnswers) {
+      const parts = [{ text: ex.answer || '暂无答案', font: pf('800 25px'), color: '#245b47', lineHeight: 35 }];
+      if (ex.explanation) parts.push({ text: ex.explanation, font: pf('22px'), color: '#596b62', lineHeight: 31, gap: 10 });
+      y = drawPosterBox(ctx, y + 4, { label: '参考答案', fill: '#edf6f2', stroke: '#b9dccc', labelColor: '#2b6a51' }, parts);
+    } else if (!(Array.isArray(ex.options) && ex.options.length)) {
+      // 没选项的题（连词成句、情境问答）给学生留一条写答案的线
+      ctx.fillStyle = '#b5aba0';
+      ctx.font = pf('800 17px');
+      ctx.fillText('我的答案', 62, y);
+      ctx.strokeStyle = '#d8cfc4';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath(); ctx.moveTo(62, y + 64); ctx.lineTo(688, y + 64); ctx.stroke();
+      ctx.setLineDash([]);
+      y += 84;
+    }
+    y += 10;
   });
-  return lines.join('\n');
+
+  posterFooter(ctx, height, includeAnswers ? '答案解析图 · 供老师复核和课堂使用' : '学生做题图 · 做完发给老师批改');
+  return y;
 }
 
-/* ================= 课后闪卡网页生成内核 (含练习题) ================= */
-function generateStudentFlashcardHtml() {
-  const student = $('#studentName').value.trim() || 'Student';
-  const date = $('#lessonDate').value.trim() || todayStr;
-  const targetLang = $('#targetLangSelect').value;
-  /* ⚠️ 2026-09-03 修（小克）：原来写的是 .replace(/</g, "\u003c")——在 JS 里 "\u003c" 就是 "<" 本身，
-     等于把 < 换成 <，**完全没转义**。实测：释义里只要出现一个闭合的 script 标签，
-     导出的闪卡文件就在那儿断掉、整页散架。必须写成 "\\u003c"（反斜杠+u003c 六个字符）。
-     （这段注释本身也不能写字面量的闭合 script 标签——HTML 解析器不认注释，
-       2026-09-03 小克就是这么把页面写坏过一次的。） */
-  const escJsonForScript = (v) => JSON.stringify(v)
-    .replace(/</g, "\\u003c")
-    .replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
-  const cardsDataJson = escJsonForScript(visibleVocab());
-  const exercisesJson = escJsonForScript(currentExercises);
+function drawVocabPoster(ctx, list, meta, height) {
+  posterFrame(ctx, height, '词来 · 课后复习资料',
+    `${meta.student} · ${meta.date} · ${list.length} 个生词`, '中文 · 拼音 · 释义 · 例句');
 
-  return `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>词来 · ${student} 的汉语生词复习闪卡 (${date})</title>
-<style>
-:root {
-  --bg: #fdfbf7;
-  --card-bg: #ffffff;
-  --ink: #2b2723;
-  --ink-soft: #635c54;
-  --ink-dim: #999086;
-  --primary: #c26538;
-  --primary-light: #faece5;
-  --accent: #2e6b52;
-  --accent-light: #e8f3ee;
-  --danger: #b83c34;
-  --line: #e8e2d9;
-  --shadow: 0 12px 32px rgba(43,39,35,0.09);
-  --font-serif: "Songti SC", "Source Han Serif SC", "STSong", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  font-family: var(--font-sans);
-  background: var(--bg);
-  color: var(--ink);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 16px 60px;
-}
-.c4d-icon {
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  vertical-align: middle;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
-}
-header {
-  width: 100%;
-  max-width: 580px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.title-box h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.title-box p {
-  font-size: 13px;
-  color: var(--ink-dim);
-  margin-top: 2px;
-}
-.mode-tabs {
-  display: flex;
-  background: #f0eae1;
-  padding: 3px;
-  border-radius: 8px;
-  gap: 2px;
-}
-.mode-tab {
-  border: none;
-  background: transparent;
-  padding: 6px 11px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-soft);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.mode-tab.active {
-  background: #ffffff;
-  color: var(--primary);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-}
+  let y = 204;
+  list.forEach((card, index) => {
+    if (index > 0) { posterDivider(ctx, y - 20); y += 30; }
+    ctx.fillStyle = '#c26538';
+    ctx.font = pf('800 22px');
+    ctx.fillText(String(index + 1).padStart(2, '0'), 62, y + 10);
+    ctx.fillStyle = '#2f2925';
+    ctx.font = pf('800 48px', true);
+    ctx.fillText(card.word || '生词', 118, y);
+    ctx.fillStyle = '#c26538';
+    ctx.font = pf('700 27px');
+    ctx.fillText(card.pinyin || '', 118, y + 60);
+    if (card.hsk > 0) {
+      posterRoundedRect(ctx, 610, y + 10, 78, 34, 17, '#fff5dd', '#ecd49a');
+      ctx.fillStyle = '#9b6f1c';
+      ctx.font = pf('800 18px');
+      ctx.textAlign = 'center';
+      ctx.fillText(`H${card.hsk}`, 649, y + 18);
+      ctx.textAlign = 'left';
+    }
+    y += 112;
 
-.card-scene {
-  width: 100%;
-  max-width: 480px;
-  height: 350px;
-  perspective: 1000px;
-  margin: 10px auto 20px;
-  cursor: pointer;
-}
-.card-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.4, 1.15);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-}
-.card-inner.is-flipped {
-  transform: rotateY(180deg);
-}
-.card-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  background: var(--card-bg);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 22px 26px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.card-back {
-  transform: rotateY(180deg);
-  background: #ffffff;
-}
-.face-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-.card-counter {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-dim);
-}
-.audio-btn {
-  background: var(--primary-light);
-  border: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.15s;
-}
-.audio-btn:active { transform: scale(0.92); }
+    const block = (label, value, color) => {
+      if (!value) return;
+      ctx.fillStyle = color;
+      ctx.font = pf('800 18px');
+      ctx.fillText(label, 62, y);
+      y += 28;
+      ctx.fillStyle = '#2f2925';
+      ctx.font = pf('700 26px');
+      y = posterText(ctx, value, 62, y, 626, 36, 4) + 18;
+    };
+    block('ENGLISH', card.english || '暂无英文释义', '#c26538');
+    if (meta.hasSecond && card.native_def) block(meta.lang, card.native_def, '#2b6a51');
 
-.face-center {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 12px;
-}
-.hanzi-main {
-  font-family: var(--font-serif);
-  font-size: 64px;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 2px;
-  line-height: 1;
-}
-.pinyin-sub {
-  font-size: 22px;
-  color: var(--primary);
-  font-weight: 500;
-}
-.hint-text {
-  font-size: 12.5px;
-  color: var(--ink-dim);
-}
-
-.back-content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
-  width: 100%;
-}
-.back-word-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-.back-word-hz {
-  font-family: var(--font-serif);
-  font-size: 26px;
-  font-weight: 700;
-}
-.back-word-py {
-  font-size: 17px;
-  color: var(--primary);
-  font-weight: 600;
-}
-.back-defs-box {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 14.5px;
-}
-.back-def-item {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-.back-tag {
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-.tag-en-c { background: #eef2f6; color: #3b5998; }
-.tag-na-c { background: #faede6; color: #c26538; }
-
-.back-sent-box {
-  background: var(--bg);
-  border-left: 3px solid var(--primary);
-  border-radius: 6px;
-  padding: 9px 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.back-sent-zh {
-  font-size: 15.5px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.back-sent-py {
-  font-size: 12.5px;
-  color: var(--ink-dim);
-}
-.back-sent-trans {
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-
-.controls {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.self-assess {
-  display: flex;
-  gap: 12px;
-}
-.assess-btn {
-  flex: 1;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #ffffff;
-  transition: all 0.15s;
-}
-.assess-btn.btn-pass {
-  color: var(--accent);
-  border-color: rgba(46,107,82,0.3);
-}
-.assess-btn.btn-pass:active { background: var(--accent-light); }
-.assess-btn.btn-again {
-  color: var(--primary);
-  border-color: rgba(194,101,56,0.3);
-}
-.assess-btn.btn-again:active { background: var(--primary-light); }
-
-.nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.nav-btn {
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.progress-bar-wrap {
-  flex: 1;
-  height: 6px;
-  background: #eee8de;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  background: var(--primary);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-
-.view-section {
-  width: 100%;
-  max-width: 580px;
-  display: none;
-  flex-direction: column;
-  gap: 14px;
-}
-.view-section.active { display: flex; }
-.card-scene.hidden { display: none; }
-.controls.hidden { display: none; }
-
-.table-card {
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-}
-
-.exercise-item {
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-}
-.opt-btn {
-  padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: #fdfbf7;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.15s;
-}
-.opt-btn.correct { background: var(--accent); color: #fff; border-color: var(--accent); }
-.opt-btn.wrong { background: var(--danger); color: #fff; border-color: var(--danger); }
-</style>
-</head>
-<body>
-
-<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="c4d-spk" cx="35%" cy="30%" r="70%">
-      <stop offset="0%" stop-color="#ff9a6c"/>
-      <stop offset="70%" stop-color="#c25220"/>
-      <stop offset="100%" stop-color="#8f300c"/>
-    </radialGradient>
-    <linearGradient id="c4d-cone" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffbe99"/>
-      <stop offset="60%" stop-color="#d96633"/>
-      <stop offset="100%" stop-color="#a83c13"/>
-    </linearGradient>
-    <radialGradient id="c4d-pass" cx="35%" cy="30%" r="70%">
-      <stop offset="0%" stop-color="#7fe0a6"/>
-      <stop offset="65%" stop-color="#2e9960"/>
-      <stop offset="100%" stop-color="#19633c"/>
-    </radialGradient>
-    <radialGradient id="c4d-again" cx="35%" cy="30%" r="70%">
-      <stop offset="0%" stop-color="#ffb07a"/>
-      <stop offset="65%" stop-color="#d95e26"/>
-      <stop offset="100%" stop-color="#99380d"/>
-    </radialGradient>
-  </defs>
-</svg>
-
-<header>
-  <div class="title-box">
-    <h1>词来 · ${escapeHtml(student)} 的汉语生词复习闪卡</h1>
-    <p>英汉双语/二翻对照版 · ${escapeHtml(date)} · 共 <span id="totalCardsCount">0</span> 词</p>
-  </div>
-  <div class="mode-tabs">
-    <button class="mode-tab active" id="tabFlashcards" onclick="switchMode('cards')">
-      <span>闪卡自测</span>
-    </button>
-    <button class="mode-tab" id="tabList" onclick="switchMode('list')">
-      <span>词表总览</span>
-    </button>
-    <button class="mode-tab" id="tabExercises" onclick="switchMode('exercises')">
-      <span>随堂练习</span>
-    </button>
-  </div>
-</header>
-
-<div class="card-scene" id="cardScene" onclick="flipCard()">
-  <div class="card-inner" id="cardInner">
-    <div class="card-face card-front">
-      <div class="face-top">
-        <span class="card-counter" id="frontCounter">1 / 1</span>
-        <button class="audio-btn" onclick="event.stopPropagation(); playCurrentWordAudio();" title="朗读">
-          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:24px;height:24px;">
-            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
-            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
-            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
-          </svg>
-        </button>
-      </div>
-      <div class="face-center">
-        <div class="hanzi-main" id="frontHanzi">词</div>
-        <div class="pinyin-sub" id="frontPinyin">cí</div>
-      </div>
-      <div class="hint-text" style="text-align:center;">点击卡片翻转看英汉双语释义与例句</div>
-    </div>
-
-    <div class="card-face card-back">
-      <div class="face-top">
-        <span class="card-counter" id="backCounter">1 / 1</span>
-        <button class="audio-btn" onclick="event.stopPropagation(); playCurrentSentenceAudio();" title="朗读例句">
-          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:24px;height:24px;">
-            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
-            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
-            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
-          </svg>
-        </button>
-      </div>
-      <div class="back-content">
-        <div class="back-word-row">
-          <span class="back-word-hz" id="backHanzi">词</span>
-          <span class="back-word-py" id="backPinyin">cí</span>
-        </div>
-        <div class="back-defs-box">
-          <div class="back-def-item">
-            <span class="back-tag tag-en-c">EN</span>
-            <span id="backEnglish">English definition</span>
-          </div>
-          <div class="back-def-item" id="boxBackNative">
-            <span class="back-tag tag-na-c" id="tagBackNative">二翻</span>
-            <span id="backNativeDef">Native definition</span>
-          </div>
-        </div>
-        <div class="back-sent-box">
-          <div class="back-sent-zh" id="backSentZh">这是例句。</div>
-          <div class="back-sent-py" id="backSentPy">Zhè shì lìjù.</div>
-          <div class="back-sent-trans" id="backSentEn" style="color:#4a5b78;">EN: Example English.</div>
-          <div class="back-sent-trans" id="backSentNative">二翻: Example Native.</div>
-        </div>
-      </div>
-      <div class="hint-text" style="text-align:center;">点击翻回正面</div>
-    </div>
-  </div>
-</div>
-
-<div class="controls" id="cardControls">
-  <div class="self-assess">
-    <button class="assess-btn btn-again" onclick="markCard(false)">
-      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-        <circle cx="24" cy="24" r="20" fill="url(#c4d-again)"/>
-        <path d="M14 24 C14 18.5, 18.5 14, 24 14 C28.5 14, 32.5 17, 33.6 21 M34 16 L34 21.5 L28.5 21.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M34 24 C34 29.5, 29.5 34, 24 34 C19.5 34, 15.5 31, 14.4 27 M14 32 L14 26.5 L19.5 26.5" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
-      </svg>
-      <span>还要再练</span>
-    </button>
-    <button class="assess-btn btn-pass" onclick="markCard(true)">
-      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-        <circle cx="24" cy="24" r="20" fill="url(#c4d-pass)"/>
-        <path d="M15 24 L21 30 L33 17" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span>我掌握了</span>
-    </button>
-  </div>
-  <div class="nav-row">
-    <button class="nav-btn" onclick="prevCard()">‹ 上一个</button>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <button class="nav-btn" onclick="nextCard()">下一个 ›</button>
-  </div>
-</div>
-
-<div class="view-section" id="listView"></div>
-
-<div class="view-section" id="exercisesView">
-  <div id="studentExercisesContainer" style="display:flex;flex-direction:column;gap:14px;"></div>
-</div>
-
-<script>
-const CARDS = ${cardsDataJson};
-const EXERCISES = ${exercisesJson};
-let currentIndex = 0;
-let mastered = new Set();
-
-document.getElementById('totalCardsCount').textContent = CARDS.length;
-
-function renderCurrentCard() {
-  if (!CARDS.length) return;
-  const c = CARDS[currentIndex];
-  document.getElementById('frontHanzi').textContent = c.word;
-  document.getElementById('frontPinyin').textContent = c.pinyin;
-  document.getElementById('frontCounter').textContent = (currentIndex + 1) + " / " + CARDS.length;
-
-  document.getElementById('backHanzi').textContent = c.word;
-  document.getElementById('backPinyin').textContent = c.pinyin;
-  document.getElementById('backEnglish').textContent = c.english || '';
-
-  const hasNative = !!(c.native_def && c.native_def.trim());
-  document.getElementById('boxBackNative').style.display = hasNative ? 'flex' : 'none';
-  if (hasNative) {
-    document.getElementById('backNativeDef').textContent = c.native_def;
-  }
-
-  document.getElementById('backSentZh').textContent = c.sentence_zh;
-  document.getElementById('backSentPy').textContent = c.sentence_py;
-  document.getElementById('backSentEn').textContent = "EN: " + (c.sentence_en || '');
-
-  const hasSentNative = !!(c.sentence_native && c.sentence_native.trim());
-  document.getElementById('backSentNative').style.display = hasSentNative ? 'block' : 'none';
-  if (hasSentNative) {
-    document.getElementById('backSentNative').textContent = "二翻: " + c.sentence_native;
-  }
-
-  document.getElementById('backCounter').textContent = (currentIndex + 1) + " / " + CARDS.length;
-  document.getElementById('cardInner').classList.remove('is-flipped');
-  document.getElementById('progressBar').style.width = ((mastered.size / CARDS.length) * 100) + "%";
-}
-
-function flipCard() {
-  document.getElementById('cardInner').classList.toggle('is-flipped');
-}
-
-function nextCard() {
-  if (currentIndex < CARDS.length - 1) {
-    currentIndex++;
-    renderCurrentCard();
-  } else {
-    currentIndex = 0;
-    renderCurrentCard();
-  }
-}
-
-function prevCard() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    renderCurrentCard();
-  }
-}
-
-function markCard(isPass) {
-  if (isPass) {
-    mastered.add(currentIndex);
-  } else {
-    mastered.delete(currentIndex);
-  }
-  nextCard();
-}
-
-function playSpeech(text) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'zh-CN';
-  u.rate = 0.88;
-  window.speechSynthesis.speak(u);
-}
-
-function playCurrentWordAudio() {
-  if (CARDS[currentIndex]) playSpeech(CARDS[currentIndex].word);
-}
-
-function playCurrentSentenceAudio() {
-  if (CARDS[currentIndex]) playSpeech(CARDS[currentIndex].sentence_zh);
-}
-
-function switchMode(mode) {
-  document.getElementById('tabFlashcards').classList.toggle('active', mode === 'cards');
-  document.getElementById('tabList').classList.toggle('active', mode === 'list');
-  document.getElementById('tabExercises').classList.toggle('active', mode === 'exercises');
-
-  document.getElementById('cardScene').classList.toggle('hidden', mode !== 'cards');
-  document.getElementById('cardControls').classList.toggle('hidden', mode !== 'cards');
-  document.getElementById('listView').classList.toggle('active', mode === 'list');
-  document.getElementById('exercisesView').classList.toggle('active', mode === 'exercises');
-
-  if (mode === 'list') renderListView();
-  if (mode === 'exercises') renderStudentExercises();
-}
-
-function renderListView() {
-  const lv = document.getElementById('listView');
-  lv.innerHTML = CARDS.map((c, i) => \`
-    <div class="table-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;gap:8px;align-items:baseline;">
-          <b style="font-size:20px;font-family:var(--font-serif)">\${c.word}</b>
-          <span style="color:var(--primary);font-weight:500">\${c.pinyin}</span>
-        </div>
-        <button class="audio-btn" style="width:32px;height:32px;" onclick="playSpeech('\${c.word}')">
-          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none" style="width:20px;height:20px;">
-            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-spk)"/>
-            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-cone)"/>
-            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
-          </svg>
-        </button>
-      </div>
-      <div style="font-size:14px;color:var(--ink-soft)">
-        <b>EN:</b> \${c.english || ''} \${c.native_def ? ' | <b>二翻:</b> ' + c.native_def : ''}
-      </div>
-      <div style="background:var(--bg);padding:8px 12px;border-radius:6px;font-size:13.5px;border-left:3px solid var(--primary);">
-        <b>\${c.sentence_zh}</b><br>
-        <span style="color:var(--ink-dim);font-size:12px">\${c.sentence_py}</span><br>
-        <span style="color:#4a5b78;font-size:12.5px">EN: \${c.sentence_en || ''}</span>
-        \${c.sentence_native ? '<br><span style="color:var(--primary);font-size:12.5px">二翻: ' + c.sentence_native + '</span>' : ''}
-      </div>
-    </div>
-  \`).join("");
-}
-
-function renderStudentExercises() {
-  const container = document.getElementById('studentExercisesContainer');
-  if (!EXERCISES || !EXERCISES.length) {
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink-dim)">本次课暂未生成练习题，请先复习上方生词卡片。</div>';
-    return;
-  }
-  container.innerHTML = EXERCISES.map((ex, i) => \`
-    <div class="exercise-item" id="sExCard_\${i}">
-      <div style="font-size:16px;font-weight:600">\${i+1}. \${ex.question}</div>
-      <div style="font-size:13px;color:var(--ink-dim)">\${ex.pinyin}</div>
-      <div style="font-size:13.5px;color:var(--ink-soft)">\${ex.translation}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-        \${ex.options.map(opt => \`
-          <button class="opt-btn" onclick="studentCheckAnswer(\${i}, '\${opt}', '\${ex.answer}', this)">\${opt}</button>
-        \`).join("")}
-      </div>
-    </div>
-  \`).join("");
-}
-
-function studentCheckAnswer(idx, chosen, answer, btnEl) {
-  const card = document.getElementById('sExCard_' + idx);
-  const btns = card.querySelectorAll('.opt-btn');
-  btns.forEach(b => {
-    b.classList.remove('correct', 'wrong');
-    if (b.textContent === answer) b.classList.add('correct');
+    if (card.sentence_zh) {
+      const parts = [
+        { text: card.sentence_zh, font: pf('700 24px'), color: '#2f2925', lineHeight: 34, maxLines: 4 },
+        { text: card.sentence_py || '', font: pf('21px'), color: '#8e847a', lineHeight: 29, gap: 6, maxLines: 4 },
+        { text: card.sentence_en ? `EN: ${card.sentence_en}` : '', font: pf('20px'), color: '#596b87', lineHeight: 28, gap: 6, maxLines: 4 },
+        { text: meta.hasSecond && card.sentence_native ? `${meta.lang}: ${card.sentence_native}` : '',
+          font: pf('20px'), color: '#c26538', lineHeight: 28, gap: 6, maxLines: 4 }
+      ].filter(p => p.text);
+      y = drawPosterBox(ctx, y + 4, { label: '例句', fill: '#fdf2eb', stroke: '#f2cebc', labelColor: '#c26538' }, parts) + 14;
+    } else {
+      y += 8;
+    }
   });
-  if (chosen !== answer) {
-    btnEl.classList.add('wrong');
-  }
+
+  posterFooter(ctx, height, '复习建议：先看长图，再做课后练习。');
+  return y;
 }
 
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
-  if (e.code === 'ArrowRight') nextCard();
-  if (e.code === 'ArrowLeft') prevCard();
-});
+// 图高先量后定：在废画布上空画一遍拿到内容真实的结束位置，再按这个高度正式画。
+function renderPosterPng(drawFn, list, meta) {
+  const probe = document.createElement('canvas');
+  probe.width = 750; probe.height = 10;
+  const endY = drawFn(probe.getContext('2d'), list, meta, 30000);
+  const height = Math.max(900, Math.ceil(endY) + 120);
+  const scale = height * 750 * 4 > 60000000 ? 1 : 2;   // 超长图降到 1 倍，别把画布撑爆
+  const canvas = document.createElement('canvas');
+  canvas.width = 750 * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  drawFn(ctx, list, meta, height);
+  return canvas.toDataURL('image/png');
+}
 
-renderCurrentCard();
-<\/script>
-</body>
-</html>`;
+function posterMeta() {
+  const lang = $('#targetLangSelect').value;
+  return {
+    student: $('#studentName').value.trim() || 'Student',
+    date: $('#lessonDate').value.trim() || todayStr,
+    lang,
+    hasSecond: lang !== '英语'
+  };
+}
+
+async function exportPracticeImage(variant) {
+  if (!currentExercises.length) { showToast("练习题为空，先出一套题"); return; }
+  const meta = Object.assign(posterMeta(), { variant });
+  const label = variant === 'answer' ? '答案解析图' : '学生做题图';
+  let dataUrl;
+  try { dataUrl = renderPosterPng(drawPracticePoster, currentExercises, meta); }
+  catch (e) { showToast(`${label}画失败：${e.message || e}`); return; }
+  await saveImageFile(`词来_${meta.student}_${meta.date}_练习_${label}.png`, dataUrl);
+}
+
+async function exportVocabImage() {
+  const list = visibleVocab();
+  if (!list.length) { showToast("生词本是空的，先收藏几个词"); return; }
+  const meta = posterMeta();
+  let dataUrl;
+  try { dataUrl = renderPosterPng(drawVocabPoster, list, meta); }
+  catch (e) { showToast(`复习长图画失败：${e.message || e}`); return; }
+  await saveImageFile(`词来_${meta.student}_${meta.date}_生词复习长图.png`, dataUrl);
+}
+
+// Electron 走主进程弹保存框真写盘，并在访达里亮出来；纯浏览器（开发预览）退回下载。
+async function saveImageFile(filename, dataUrl) {
+  if (window.electronAPI && typeof window.electronAPI.saveImage === "function") {
+    const r = await window.electronAPI.saveImage(filename, dataUrl);
+    if (r && r.ok) {
+      showToast(`已保存：${r.path}（${(r.size / 1024).toFixed(0)} KB）`);
+      if (window.electronAPI.showInFolder) window.electronAPI.showInFolder(r.path);
+      return true;
+    }
+    if (r && r.canceled) { showToast("已取消保存"); return false; }
+    showToast(`保存失败：${(r && r.error) || "未知原因"}`);
+    return false;
+  }
+  const a = document.createElement('a');
+  a.href = dataUrl; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast(`已下载：${filename}`);
+  return true;
 }
 
 /* ================= 页面主交互逻辑与绑定 ================= */
@@ -4151,23 +3757,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  $('#btnCopyExercisesStudent').addEventListener('click', () => {
-    const text = getExercisesStudentText();
-    if (!text) {
-      showToast("练习题为空");
-      return;
-    }
-    copyToClipboard(text, "做题版练习已复制，可直接发给学生！");
-  });
-
-  $('#btnCopyExercisesFull').addEventListener('click', () => {
-    const text = getExercisesFullText();
-    if (!text) {
-      showToast("练习题为空");
-      return;
-    }
-    copyToClipboard(text, "题目+答案解析已复制到剪贴板！");
-  });
+  $('#btnExportPracticeStudent').addEventListener('click', () => exportPracticeImage('student'));
+  $('#btnExportPracticeAnswer').addEventListener('click', () => exportPracticeImage('answer'));
 
   let showAnswersState = false;
   $('#btnToggleAnswers').addEventListener('click', () => {
@@ -4183,7 +3774,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 11. 课后导出中心模态框
   $('#btnOpenExportModal').addEventListener('click', () => {
     if (!visibleVocab().length) {
-      showToast("请先在左侧收藏一些生词再导出闪卡");
+      showToast("请先在左侧收藏一些生词再导出复习图");
       return;
     }
     updateSummaryPreviewText();
@@ -4200,48 +3791,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  /* 2026-09-03 重写（小克，老师报「一键导出 HTML 是假功能」）：
-     原来是 <a download> + blob，而且 URL.revokeObjectURL 紧跟在 a.click() 后面
-     ——Chromium 读 blob 是异步的，同步撤销经常把下载掐死；Electron 里更是看不到
-     文件落在哪，界面却照样弹「已下载」。
-     现在：Electron 走主进程 saveFile（弹保存框、真写盘、回传真实路径，提示里报路径）；
-     纯浏览器退回 blob，但把 a 挂进 DOM 再点，撤销延后到 60 秒。 */
-  async function saveTextFile(filename, content, mime) {
-    if (window.electronAPI && typeof window.electronAPI.saveFile === "function") {
-      const r = await window.electronAPI.saveFile(filename, content);
-      if (r && r.ok) {
-        showToast(`已保存：${r.path}（${(r.size / 1024).toFixed(0)} KB）`);
-        return true;
-      }
-      if (r && r.canceled) { showToast("已取消保存"); return false; }
-      showToast(`保存失败：${(r && r.error) || "未知原因"}`);
-      return false;
-    }
-    try {
-      const blob = new Blob([content], { type: mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-      showToast(`已下载：${filename}`);
-      return true;
-    } catch (e) {
-      showToast(`下载失败：${e.message || e}`);
-      return false;
-    }
-  }
-
-  // 12. 导出单文件复习网页 HTML
-  $('#btnDownloadHtmlCard').addEventListener('click', async () => {
-    if (!visibleVocab().length) { showToast("生词本是空的，先收藏几个词"); return; }
-    const student = $('#studentName').value.trim() || 'Student';
-    const date = $('#lessonDate').value.trim() || todayStr;
-    await saveTextFile(`词来_${student}_${date}_生词复习闪卡.html`,
-                       generateStudentFlashcardHtml(), 'text/html;charset=utf-8');
-  });
+  // 12. 导出生词复习长图（PNG）
+  $('#btnExportVocabImage').addEventListener('click', exportVocabImage);
 
   // 13. 复制课后总结消息 (双语对照)
   function generateSummaryText() {
@@ -4264,7 +3815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       lines.push('');
     });
-    lines.push(`Review tip: Open the attached flashcard HTML file on your phone or laptop to practice pronunciation, flip cards, and do the exercises.`);
+    lines.push(`Review tip: Look through the attached review picture, then do the practice sheet and send it back to me.`);
     lines.push(`See you next class!`);
     return lines.join('\n');
   }
@@ -4283,22 +3834,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('#btnCopySummaryMessage').addEventListener('click', () => {
     copyToClipboard(generateSummaryText(), "课后总结已复制到剪贴板！");
-  });
-
-  // 14. 导出 Anki / Quizlet CSV
-  $('#btnExportCsv').addEventListener('click', async () => {
-    if (!visibleVocab().length) return;
-    let csv = "Front\tPinyin\tBack\n";
-    visibleVocab().forEach(item => {
-      let back = `<b>EN:</b> ${item.english}`;
-      if (item.native_def) back += `<br><b>二翻:</b> ${item.native_def}`;
-      back += `<br><br><b>例句：</b>${item.sentence_zh}<br><i>${item.sentence_py}</i><br>EN: ${item.sentence_en}`;
-      if (item.sentence_native) back += `<br>二翻: ${item.sentence_native}`;
-      csv += `${item.word}\t${item.pinyin}\t"${back.replace(/"/g, '""')}"\n`;
-    });
-    // 2026-09-03（小克）：跟 HTML 导出同一个毛病，一起走真的存文件
-    await saveTextFile(`词来_${$('#studentName').value.trim() || 'vocab'}_anki.txt`,
-                       csv, 'text/tab-separated-values;charset=utf-8');
   });
 
   // 15. 深色模式切换

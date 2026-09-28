@@ -125,21 +125,21 @@ function createWindow() {
   });
 }
 
-/* 2026-09-03 加（小克）：真正把文件写到盘上，并把路径回传给界面。
-   老师点「一键下载网页」原来只是 <a download> + blob，Electron 里看不到文件落在哪，
-   界面却弹「已下载」——这就是假功能。现在：弹保存框 → 真写 → 回传真实路径。 */
-ipcMain.handle('cilai:save-file', async (_evt, { name, content }) => {
+/* 2026-09-28 加（小克）：课后练习图、生词复习长图存 PNG。渲染层传 dataURL，这里解成二进制写盘。 */
+ipcMain.handle('cilai:save-image', async (_evt, { name, dataUrl }) => {
   try {
-    const defaultPath = path.join(app.getPath('downloads'), String(name || 'cilai-export'));
+    const m = /^data:image\/(png|jpeg);base64,(.+)$/.exec(String(dataUrl || ''));
+    if (!m) return { ok: false, error: '图片数据不对' };
+    const defaultPath = path.join(app.getPath('downloads'), String(name || 'cilai.png'));
     const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-      title: '保存到哪里',
+      title: '图片存到哪里',
       defaultPath,
-      buttonLabel: '保存'
+      buttonLabel: '保存',
+      filters: [{ name: '图片', extensions: [m[1] === 'png' ? 'png' : 'jpg'] }]
     });
     if (canceled || !filePath) return { ok: false, canceled: true };
-    fs.writeFileSync(filePath, content, 'utf-8');
-    const size = fs.statSync(filePath).size;
-    return { ok: true, path: filePath, size };
+    fs.writeFileSync(filePath, Buffer.from(m[2], 'base64'));
+    return { ok: true, path: filePath, size: fs.statSync(filePath).size };
   } catch (e) {
     return { ok: false, error: String(e && e.message ? e.message : e) };
   }
