@@ -2105,6 +2105,12 @@ CONTINENT_LANG_DATA.forEach(group => {
   });
 });
 
+// 二翻标签用语种缩写（乌克兰语→UK），原来取中文名前两个字，出来是「乌克:」（2026-09-28 老师）
+function langAbbr(lang) {
+  const hit = ALL_LANGS_FLAT.find(l => l.name === lang);
+  return hit && hit.code ? hit.code : String(lang || '').substring(0, 2).toUpperCase();
+}
+
 const LANG_STORAGE_FAV_KEY = 'cilai_favorite_langs';
 
 function getFavoriteLangs() {
@@ -2386,7 +2392,7 @@ function updateLabelsForLang() {
 
   if (!isEnglishOnly) {
     $('#labelNativeDef').textContent = `母语释义 (${lang} - 二翻)`;
-    document.querySelectorAll('.tag-sent-native').forEach(t => t.textContent = lang.substring(0, 2));
+    document.querySelectorAll('.tag-sent-native').forEach(t => t.textContent = langAbbr(lang));
   }
 }
 
@@ -3015,7 +3021,7 @@ function getFormattedFull(item) {
   const hasSecond = (lang !== '英语' && item.native_def);
 
   if (hasSecond) {
-    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${lang.substring(0,2).toUpperCase()}: ${item.native_def}\n例句：${item.sentence_zh}\nEN: ${item.sentence_en}\n${lang.substring(0,2).toUpperCase()}: ${item.sentence_native || ''}`;
+    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${langAbbr(lang)}: ${item.native_def}\n例句：${item.sentence_zh}\nEN: ${item.sentence_en}\n${langAbbr(lang)}: ${item.sentence_native || ''}`;
   } else {
     return `${item.word} [${item.pinyin}] ${item.english}\n例句：${item.sentence_zh}\n(${item.sentence_en})`;
   }
@@ -3025,7 +3031,7 @@ function getFormattedMinimal(item) {
   const lang = $('#targetLangSelect').value;
   const hasSecond = (lang !== '英语' && item.native_def);
   if (hasSecond) {
-    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${lang.substring(0,2).toUpperCase()}: ${item.native_def}`;
+    return `${item.word} [${item.pinyin}]\nEN: ${item.english}\n${langAbbr(lang)}: ${item.native_def}`;
   } else {
     return `${item.word} [${item.pinyin}] - ${item.english}`;
   }
@@ -3038,7 +3044,7 @@ function getFormattedSentence(item) {
   const lines = [item.sentence_zh];
   if (item.sentence_py) lines.push(item.sentence_py);
   if (item.sentence_en) lines.push(`EN: ${item.sentence_en}`);
-  if (hasSecond) lines.push(`${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`);
+  if (hasSecond) lines.push(`${langAbbr(lang)}: ${item.sentence_native}`);
   return lines.join('\n');
 }
 
@@ -3755,12 +3761,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       lines.push(`${i+1}. ${item.word} [${item.pinyin}]`);
       lines.push(`   EN: ${item.english}`);
       if (hasSecond && item.native_def) {
-        lines.push(`   ${lang.substring(0,2).toUpperCase()}: ${item.native_def}`);
+        lines.push(`   ${langAbbr(lang)}: ${item.native_def}`);
       }
       lines.push(`   例句: ${item.sentence_zh}`);
       lines.push(`   EN: ${item.sentence_en}`);
       if (hasSecond && item.sentence_native) {
-        lines.push(`   ${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`);
+        lines.push(`   ${langAbbr(lang)}: ${item.sentence_native}`);
       }
       lines.push('');
     });
