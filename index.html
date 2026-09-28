@@ -3109,7 +3109,14 @@ function loadWordFromList(idx) {
   if (!item) return;
   currentActiveWord = JSON.parse(JSON.stringify(item));
   ensureSentences(currentActiveWord);
+  currentActiveWord._defsFromAi = true;   // 本子里的释义是定稿，补例句时别拿 AI 的覆盖
+  sentFailed = {};
   updateCardUI();
+  /* 2026-09-28 补（老师截图「这是什么情况」）：改三栏以前存进本子的词只有一句，
+     调出来简单句／长难句是空框。哪档空着就自动补上，补好会同步回生词本。 */
+  if (isServerOnline && $('#engineSelect').value !== 'offline') {
+    DIFFS.filter(d => !currentActiveWord.sentences[d].zh).forEach(d => requestAiSentence(d, false));
+  }
   showToast(`已加载生词【${item.word}】`);
 }
 
