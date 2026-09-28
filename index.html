@@ -519,21 +519,30 @@ main {
   gap: 20px;
   overflow: hidden;
 }
+/* 2026-09-28 改三栏（老师画的图）：左＝查词＋词头＋英文＋二翻＋复制；中＝三档例句；右＝生词本 */
 .desk-col {
-  flex: 1.18;
+  flex: 0.78;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-width: 0;
+  min-width: 290px;
+  height: 100%;
+  overflow: hidden;
+}
+.sent-col {
+  flex: 1.35;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
   height: 100%;
   overflow: hidden;
 }
 .list-col {
-  flex: 0.82;
+  flex: 0.8;
   display: flex;
   flex-direction: column;
-  min-width: 340px;
-  max-width: 460px;
+  min-width: 300px;
+  max-width: 440px;
   height: 100%;
   overflow: hidden;
 }
@@ -563,7 +572,7 @@ main {
     flex: none !important;
     padding: 12px 14px 24px !important;
   }
-  .desk-col, .list-col {
+  .desk-col, .sent-col, .list-col {
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
@@ -606,7 +615,7 @@ main {
   width: 100%;
   font-size: 18px;
   font-weight: 600;
-  padding: 13px 115px 13px 18px;
+  padding: 13px 84px 13px 16px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--line);
   background: var(--panel-alt);
@@ -685,6 +694,7 @@ main {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
 }
 .word-title-area {
@@ -811,10 +821,25 @@ main {
   flex: 1;
 }
 
-/* 例句专区与场景轮换工具栏 */
+/* 例句专区：三档各一框，「用这句」选中的那框描主色 */
+.sent-col-header { align-items: center; padding: 10px 18px 9px; }
+.sent-col-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+.sent-col-body { padding: 10px 14px; gap: 8px; }
+/* 中栏要一屏放下三档：框、输入框都收紧一点 */
+.sent-col .sentence-box { padding: 8px 12px; gap: 4px; }
+.sent-col .sentence-box .editable-field { padding: 3px 9px; line-height: 1.4; }
+.sent-col .sent-zh .editable-field { font-size: 15.5px !important; }
+.sent-level { display: flex; align-items: baseline; gap: 6px; }
+.sent-level-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.sent-level-sub { font-size: 11.5px; color: var(--ink-dim); }
+.sent-tools { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.sentence-box.is-main { border-left-color: var(--primary); box-shadow: 0 2px 10px rgba(194,101,56,0.10); }
+.sentence-box.is-main .sent-level-name { color: var(--primary); }
+.use-chip.on { background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 700; cursor: default; }
+.def-field { resize: none; overflow: hidden; }
 .sentence-box {
   background: var(--panel-alt);
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--line);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 14px 16px;
   display: flex;
@@ -1525,7 +1550,7 @@ main {
     <!-- 查词卡 -->
     <div class="search-card">
       <div class="search-bar-wrap">
-        <input type="text" id="wordInput" class="search-input" placeholder="输入生词，按 Enter 立即查询 (快捷键: /)..." autofocus autocomplete="off">
+        <input type="text" id="wordInput" class="search-input" placeholder="输入生词，回车查询" autofocus autocomplete="off">
         <div class="search-btn-inside">
           <button class="btn btn-primary" id="btnSearch">查询</button>
         </div>
@@ -1562,80 +1587,21 @@ main {
       </div>
 
       <div class="card-body">
-        <!-- 释义区：英文必备 + 母语二翻 -->
-        <div class="defs-row">
-          <div class="field-group">
-            <div class="field-label">
-              <span>英文释义 (English)</span>
-              <span class="field-tag-badge tag-en">必备</span>
-            </div>
-            <input type="text" id="displayEnglish" class="editable-field" value="conveniently; in passing; by the way">
-          </div>
-
-          <div class="field-group" id="groupNativeDef">
-            <div class="field-label">
-              <span id="labelNativeDef">母语释义 (二翻)</span>
-              <span class="field-tag-badge tag-native">二翻</span>
-            </div>
-            <input type="text" id="displayNativeDef" class="editable-field" value="de paso; ya de paso">
-          </div>
-        </div>
-
-        <!-- 例句区：支持情境指定、排除旧句与历史回溯 -->
+        <!-- 释义区：英文在上、二翻在下（2026-09-28 老师画的三栏图） -->
         <div class="field-group">
           <div class="field-label">
-            <span>课堂实用生活例句</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <button class="btn btn-secondary btn-sm" id="btnAiRegen" title="重新生成或换一个完全不同的例句">
-                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-                  <path d="M22 4 C22 14, 14 22, 4 22 C14 22, 22 30, 22 40 C22 30, 30 22, 40 22 C30 22, 22 14, 22 4 Z" fill="url(#c4d-grad-spark)"/>
-                </svg>
-                <span>换例句</span>
-              </button>
-            </div>
+            <span>英文释义 (English)</span>
+            <span class="field-tag-badge tag-en">必备</span>
           </div>
+          <textarea id="displayEnglish" class="editable-field autogrow def-field" rows="1"></textarea>
+        </div>
 
-          <div class="sentence-box">
-            <!-- 教学难度三档切换栏 (简单句 / 中等难度 / 复杂句) -->
-            <div class="sent-header-row">
-              <div class="diff-tabs-row" id="diffTabsRow">
-                <span style="font-size:11.5px;color:var(--ink-dim);margin-right:4px;">教学难度:</span>
-                <span class="diff-tab-btn" data-diff="simple" onclick="selectDifficulty('simple')">简单句 (初级)</span>
-                <span class="diff-tab-btn active" data-diff="medium" onclick="selectDifficulty('medium')">中等难度 (中级)</span>
-                <span class="diff-tab-btn" data-diff="complex" onclick="selectDifficulty('complex')">复杂句 (高级)</span>
-              </div>
-
-              <!-- 上一句/下一句回溯 -->
-              <div class="history-stepper" id="historyStepper" style="display:none;">
-                <button class="step-btn" id="btnPrevSentence" title="上一句">‹</button>
-                <span id="sentHistoryIndex">1/1</span>
-                <button class="step-btn" id="btnNextSentence" title="下一句">›</button>
-              </div>
-            </div>
-
-            <div class="sent-zh">
-              <textarea id="displaySentZh" class="editable-field autogrow" rows="1" style="flex:1;font-weight:600;font-size:16.5px;resize:none;overflow:hidden;">你去超市的时候，能顺便帮我买瓶牛奶吗？</textarea>
-              <button class="audio-btn" id="btnAudioSent" title="朗读例句">
-                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-                  <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
-                  <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
-                  <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
-                  <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-            <div class="sent-py">
-              <textarea id="displaySentPy" class="editable-field autogrow" rows="1" style="font-size:13px;resize:none;overflow:hidden;">Nǐ qù chāoshì de shíhou, néng shùnbiàn bāng wǒ mǎi píng niúnǎi ma?</textarea>
-            </div>
-            <div class="sent-en-row">
-              <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
-              <textarea id="displaySentEn" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;">When you go to the supermarket, could you buy a bottle of milk for me by the way?</textarea>
-            </div>
-            <div class="sent-native-row" id="rowSentNative">
-              <span class="field-tag-badge tag-native" id="tagSentNative" style="flex-shrink:0;">二翻</span>
-              <textarea id="displaySentNative" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;">¿Cuando vayas al supermercado, puedes traerme una botella de leche de paso?</textarea>
-            </div>
+        <div class="field-group" id="groupNativeDef">
+          <div class="field-label">
+            <span id="labelNativeDef">母语释义 (二翻)</span>
+            <span class="field-tag-badge tag-native">二翻</span>
           </div>
+          <textarea id="displayNativeDef" class="editable-field autogrow def-field" rows="1"></textarea>
         </div>
       </div>
 
@@ -1666,6 +1632,146 @@ main {
           <button class="copy-chip" id="btnCopyMinimal" title="只复制词语、拼音和释义">仅翻译</button>
           <button class="copy-chip" id="btnCopySentence" title="只复制中文例句及其对照翻译">仅例句</button>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 中间：三档例句同时摆（2026-09-28 老师画的三栏图：简单句／中等句／长难句） -->
+  <section class="sent-col">
+    <div class="card-box">
+      <div class="card-header sent-col-header">
+        <div class="sent-col-title">课堂实用生活例句</div>
+        <button class="btn btn-secondary btn-sm" id="btnAiRegen" title="三档一起换新句">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+            <path d="M22 4 C22 14, 14 22, 4 22 C14 22, 22 30, 22 40 C22 30, 30 22, 40 22 C30 22, 22 14, 22 4 Z" fill="url(#c4d-grad-spark)"/>
+          </svg>
+          <span>三档都换</span>
+        </button>
+      </div>
+      <div class="card-body sent-col-body">
+          <div class="sentence-box" id="sentBox_simple" data-diff="simple">
+            <div class="sent-header-row">
+              <div class="sent-level">
+                <span class="sent-level-name">简单句</span>
+                <span class="sent-level-sub">初级</span>
+              </div>
+              <div class="sent-tools">
+                <div class="history-stepper" id="stepper_simple" style="display:none;">
+                  <button class="step-btn" onclick="stepHistory('simple', -1)" title="上一句">‹</button>
+                  <span id="histIdx_simple">1/1</span>
+                  <button class="step-btn" onclick="stepHistory('simple', 1)" title="下一句">›</button>
+                </div>
+                <button class="copy-chip use-chip" id="btnUse_simple" onclick="useSentence('simple')" title="复制整张卡、收进生词本、导出复习图都用这一句">用这句</button>
+                <button class="copy-chip" onclick="copySentenceLevel('simple')" title="只复制这一句和它的翻译">复制</button>
+                <button class="copy-chip" id="btnRegen_simple" onclick="triggerRegenSentence('simple')" title="这一档换一句">换一句</button>
+              </div>
+            </div>
+            <div class="sent-zh">
+              <textarea id="sentZh_simple" class="editable-field autogrow" rows="1" style="flex:1;font-weight:600;font-size:16px;resize:none;overflow:hidden;"></textarea>
+              <button class="audio-btn" onclick="speak($('#sentZh_simple').value)" title="朗读例句">
+                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+                  <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+                  <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+                  <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="sent-py">
+              <textarea id="sentPy_simple" class="editable-field autogrow" rows="1" style="font-size:13px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-en-row">
+              <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
+              <textarea id="sentEn_simple" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-native-row">
+              <span class="field-tag-badge tag-native tag-sent-native" style="flex-shrink:0;">二翻</span>
+              <textarea id="sentNative_simple" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+          </div>
+
+          <div class="sentence-box" id="sentBox_medium" data-diff="medium">
+            <div class="sent-header-row">
+              <div class="sent-level">
+                <span class="sent-level-name">中等句</span>
+                <span class="sent-level-sub">中级</span>
+              </div>
+              <div class="sent-tools">
+                <div class="history-stepper" id="stepper_medium" style="display:none;">
+                  <button class="step-btn" onclick="stepHistory('medium', -1)" title="上一句">‹</button>
+                  <span id="histIdx_medium">1/1</span>
+                  <button class="step-btn" onclick="stepHistory('medium', 1)" title="下一句">›</button>
+                </div>
+                <button class="copy-chip use-chip" id="btnUse_medium" onclick="useSentence('medium')" title="复制整张卡、收进生词本、导出复习图都用这一句">用这句</button>
+                <button class="copy-chip" onclick="copySentenceLevel('medium')" title="只复制这一句和它的翻译">复制</button>
+                <button class="copy-chip" id="btnRegen_medium" onclick="triggerRegenSentence('medium')" title="这一档换一句">换一句</button>
+              </div>
+            </div>
+            <div class="sent-zh">
+              <textarea id="sentZh_medium" class="editable-field autogrow" rows="1" style="flex:1;font-weight:600;font-size:16px;resize:none;overflow:hidden;"></textarea>
+              <button class="audio-btn" onclick="speak($('#sentZh_medium').value)" title="朗读例句">
+                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+                  <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+                  <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+                  <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="sent-py">
+              <textarea id="sentPy_medium" class="editable-field autogrow" rows="1" style="font-size:13px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-en-row">
+              <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
+              <textarea id="sentEn_medium" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-native-row">
+              <span class="field-tag-badge tag-native tag-sent-native" style="flex-shrink:0;">二翻</span>
+              <textarea id="sentNative_medium" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+          </div>
+
+          <div class="sentence-box" id="sentBox_complex" data-diff="complex">
+            <div class="sent-header-row">
+              <div class="sent-level">
+                <span class="sent-level-name">长难句</span>
+                <span class="sent-level-sub">高级</span>
+              </div>
+              <div class="sent-tools">
+                <div class="history-stepper" id="stepper_complex" style="display:none;">
+                  <button class="step-btn" onclick="stepHistory('complex', -1)" title="上一句">‹</button>
+                  <span id="histIdx_complex">1/1</span>
+                  <button class="step-btn" onclick="stepHistory('complex', 1)" title="下一句">›</button>
+                </div>
+                <button class="copy-chip use-chip" id="btnUse_complex" onclick="useSentence('complex')" title="复制整张卡、收进生词本、导出复习图都用这一句">用这句</button>
+                <button class="copy-chip" onclick="copySentenceLevel('complex')" title="只复制这一句和它的翻译">复制</button>
+                <button class="copy-chip" id="btnRegen_complex" onclick="triggerRegenSentence('complex')" title="这一档换一句">换一句</button>
+              </div>
+            </div>
+            <div class="sent-zh">
+              <textarea id="sentZh_complex" class="editable-field autogrow" rows="1" style="flex:1;font-weight:600;font-size:16px;resize:none;overflow:hidden;"></textarea>
+              <button class="audio-btn" onclick="speak($('#sentZh_complex').value)" title="朗读例句">
+                <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+                  <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
+                  <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
+                  <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
+                  <path d="M37 16 C39.5 18.5, 41 21.5, 41 24 C41 26.5, 39.5 29.5, 37 32" stroke="#d96633" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="sent-py">
+              <textarea id="sentPy_complex" class="editable-field autogrow" rows="1" style="font-size:13px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-en-row">
+              <span class="field-tag-badge tag-en" style="flex-shrink:0;">EN</span>
+              <textarea id="sentEn_complex" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+            <div class="sent-native-row">
+              <span class="field-tag-badge tag-native tag-sent-native" style="flex-shrink:0;">二翻</span>
+              <textarea id="sentNative_complex" class="editable-field autogrow" rows="1" style="flex:1;font-size:13.5px;resize:none;overflow:hidden;"></textarea>
+            </div>
+          </div>
+
       </div>
     </div>
   </section>
@@ -1934,9 +2040,18 @@ let currentVocabList = [];
 let currentExercises = [];
 let currentSelectedScenario = "";
 
-// 每个生词的例句历史记录池：word -> [ { sentence_zh, sentence_py, sentence_en, sentence_native, scenario } ]
+/* 2026-09-28 改（小克，老师画的三栏图）：例句三档同时摆。
+   currentActiveWord.sentences = { simple|medium|complex: {zh, py, en, native} }，
+   main_diff＝老师点了「用这句」的那档；sentence_zh/py/en/native 永远是主句的副本，
+   复制整张卡、生词本、导出长图、出题都照旧读这四个字段。 */
+const DIFFS = ['simple', 'medium', 'complex'];
+const DIFF_NAMES = { simple: '简单句', medium: '中等句', complex: '长难句' };
+// 例句历史池：word -> { simple: [ {zh,py,en,native} ], ... }；historyIndex["词|档"] = 当前第几句
 let wordSentenceHistory = {};
-let currentHistoryIndex = 0;
+let historyIndex = {};
+let sentPending = {};   // 档 -> 正在等的请求序号
+let sentReqSeq = 0;
+let sentFailed = {};    // 档 -> true：这次没生成出来
 
 let currentActiveWord = {
   word: "顺便",
@@ -2378,11 +2493,11 @@ function updateLabelsForLang() {
   const isEnglishOnly = (lang === '英语');
 
   $('#groupNativeDef').style.display = isEnglishOnly ? 'none' : 'flex';
-  $('#rowSentNative').style.display = isEnglishOnly ? 'none' : 'flex';
+  document.querySelectorAll('.sent-native-row').forEach(r => r.style.display = isEnglishOnly ? 'none' : 'flex');
 
   if (!isEnglishOnly) {
     $('#labelNativeDef').textContent = `母语释义 (${lang} - 二翻)`;
-    $('#tagSentNative').textContent = lang.substring(0, 2);
+    document.querySelectorAll('.tag-sent-native').forEach(t => t.textContent = lang.substring(0, 2));
   }
 }
 
@@ -2562,53 +2677,25 @@ async function lookupWord(rawWord, opts = {}) {
     english: baseEnglish,
     native_def: (targetLang !== '英语' ? '（连网自动获取二翻）' : ''),
     hsk: hsk,
-    sentence_zh: exZh,
-    sentence_py: exPy,
-    sentence_en: exEn,
-    sentence_native: (targetLang !== '英语' ? '（连网自动获取二翻）' : '')
+    main_diff: 'medium',
+    sentences: {
+      simple: { zh: '', py: '', en: '', native: '' },
+      medium: { zh: exZh, py: exPy, en: exEn, native: '' },
+      complex: { zh: '', py: '', en: '', native: '' }
+    }
   };
-
-  // 初始化该词的历史池
-  if (!wordSentenceHistory[word]) {
-    wordSentenceHistory[word] = [];
-  }
-  if (!wordSentenceHistory[word].some(s => s.sentence_zh === exZh)) {
-    wordSentenceHistory[word].push({
-      sentence_zh: exZh,
-      sentence_py: exPy,
-      sentence_en: exEn,
-      sentence_native: currentActiveWord.sentence_native,
-      scenario: "常用默认"
-    });
-  }
-  currentHistoryIndex = wordSentenceHistory[word].length - 1;
+  applyMainSentence(currentActiveWord);
+  sentFailed = {};
+  recordSentenceHistory('medium', currentActiveWord.sentences.medium);
 
   updateCardUI();
   if (!opts.noCollect) autoCollectIfEnabled();
 
   if (isServerOnline && engine !== 'offline') {
-    requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, false);
+    DIFFS.forEach(d => requestAiSentence(d, false));
   }
 }
 
-// 场景切换快速触发
-let currentDifficulty = 'medium';
-function selectDifficulty(diff) {
-  currentDifficulty = diff;
-  document.querySelectorAll('#diffTabsRow .diff-tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-diff') === diff);
-  });
-  if (currentActiveWord && currentActiveWord.word) {
-    requestAiSentence(
-      currentActiveWord.word,
-      currentActiveWord.pinyin,
-      currentActiveWord.english,
-      $('#targetLangSelect').value,
-      $('#engineSelect').value,
-      true
-    );
-  }
-}
 
 /* ================= 学生名单（2026-09-06 小克，K623） =================
    名单存两处：本机 localStorage.cilai_students（离线也能用）＋ 服务端 students_meta.json（备份）。
@@ -2765,27 +2852,46 @@ function selectScenario(sc) {
   document.querySelectorAll('.scenario-chip').forEach(c => {
     c.classList.toggle('active', c.dataset.sc === sc);
   });
-  // 立即触发换例句
   triggerRegenSentence();
 }
 
-// 换例句主入口（防重复 + 场景轮换）
-function triggerRegenSentence() {
-  syncActiveWordFromUI();
-  const word = currentActiveWord.word;
-  const targetLang = $('#targetLangSelect').value;
-  const engine = $('#engineSelect').value;
+function blankSentence() { return { zh: '', py: '', en: '', native: '' }; }
 
-  if (isServerOnline && engine !== 'offline') {
-    requestAiSentence(word, currentActiveWord.pinyin, currentActiveWord.english, targetLang, engine, true);
-  } else {
-    // 离线多句式切换
-    cycleOfflineSentence();
+// 生词本里的旧条目只有 sentence_* 四个字段，没有三档：放进它原来所在的档（默认中等句）
+function ensureSentences(w) {
+  if (!w.sentences) w.sentences = {};
+  DIFFS.forEach(d => { if (!w.sentences[d]) w.sentences[d] = blankSentence(); });
+  if (!DIFFS.includes(w.main_diff)) w.main_diff = 'medium';
+  const m = w.sentences[w.main_diff];
+  if (!m.zh && w.sentence_zh) {
+    Object.assign(m, { zh: w.sentence_zh, py: w.sentence_py || '', en: w.sentence_en || '', native: w.sentence_native || '' });
   }
 }
 
-// 离线丰富句式轮换（至少 5 种不同口语句型）
-function cycleOfflineSentence() {
+function applyMainSentence(w) {
+  ensureSentences(w);
+  const m = w.sentences[w.main_diff];
+  w.sentence_zh = m.zh;
+  w.sentence_py = m.py;
+  w.sentence_en = m.en;
+  w.sentence_native = m.native;
+}
+
+// 换例句：不给档就三档都换
+function triggerRegenSentence(diff) {
+  syncActiveWordFromUI();
+  const targets = diff ? [diff] : DIFFS;
+  const engine = $('#engineSelect').value;
+  if (isServerOnline && engine !== 'offline') {
+    targets.forEach(d => requestAiSentence(d, true));
+  } else {
+    targets.forEach(d => cycleOfflineSentence(d));
+    showToast("离线状态，换成了离线句式");
+  }
+}
+
+// 离线句式轮换（没连上服务时兜底）
+function cycleOfflineSentence(diff) {
   const word = currentActiveWord.word;
   const p = currentActiveWord.pinyin;
   const templates = [
@@ -2795,117 +2901,151 @@ function cycleOfflineSentence() {
     { zh: `他一边散步，一边（${word}）活动活动身体。`, py: `Tā yìbiān sànbù, yìbiān (${p}) huódòng huódòng shēntǐ.`, en: `While walking, he also stretches his body a bit.` },
     { zh: `我们这次去北京开会，还可以（${word}）参观一下故宫。`, py: `Wǒmen zhè cì qù Běijīng kāihuì, hái kěyǐ (${p}) cānguān yíxià Gùgōng.`, en: `Going to Beijing for a meeting this time, we can also visit the Forbidden City.` }
   ];
-
-  const nextIdx = (currentHistoryIndex + 1) % templates.length;
-  const t = templates[nextIdx];
-  currentActiveWord.sentence_zh = t.zh.replace(`（${word}）`, word);
-  currentActiveWord.sentence_py = t.py.replace(`(${p})`, p);
-  currentActiveWord.sentence_en = t.en;
-  currentActiveWord.sentence_native = t.en;
-
-  recordSentenceHistory(currentActiveWord.sentence_zh, currentActiveWord.sentence_py, currentActiveWord.sentence_en, currentActiveWord.sentence_native, "离线句式");
+  const used = DIFFS.reduce((n, d) => n + historyPool(word, d).length, 0);
+  const t = templates[(used + DIFFS.indexOf(diff)) % templates.length];
+  const sent = {
+    zh: t.zh.replace(`（${word}）`, word),
+    py: t.py.replace(`(${p})`, p),
+    en: t.en,
+    native: ''
+  };
+  currentActiveWord.sentences[diff] = sent;
+  sentFailed[diff] = false;
+  recordSentenceHistory(diff, sent);
+  applyMainSentence(currentActiveWord);
   updateCardUI();
-  showToast("已切换下一个例句");
 }
 
-function recordSentenceHistory(zh, py, en, native, scenario) {
-  const word = currentActiveWord.word;
-  if (!wordSentenceHistory[word]) wordSentenceHistory[word] = [];
-  const existingIdx = wordSentenceHistory[word].findIndex(s => s.sentence_zh === zh);
-  if (existingIdx === -1) {
-    wordSentenceHistory[word].push({ sentence_zh: zh, sentence_py: py, sentence_en: en, sentence_native: native, scenario: scenario });
-    currentHistoryIndex = wordSentenceHistory[word].length - 1;
-  } else {
-    currentHistoryIndex = existingIdx;
-  }
-  updateHistoryStepperUI();
+function historyPool(word, diff) {
+  if (!wordSentenceHistory[word]) wordSentenceHistory[word] = {};
+  if (!wordSentenceHistory[word][diff]) wordSentenceHistory[word][diff] = [];
+  return wordSentenceHistory[word][diff];
 }
 
-function updateHistoryStepperUI() {
+function recordSentenceHistory(diff, sent) {
+  if (!sent || !sent.zh) return;
   const word = currentActiveWord.word;
-  const pool = wordSentenceHistory[word] || [];
-  const stepper = $('#historyStepper');
-  if (pool.length > 1) {
-    stepper.style.display = 'flex';
-    $('#sentHistoryIndex').textContent = `${currentHistoryIndex + 1}/${pool.length}`;
-  } else {
-    stepper.style.display = 'none';
-  }
+  const pool = historyPool(word, diff);
+  let idx = pool.findIndex(s => s.zh === sent.zh);
+  if (idx === -1) { pool.push({ ...sent }); idx = pool.length - 1; }
+  historyIndex[`${word}|${diff}`] = idx;
 }
 
-function stepHistory(offset) {
+function stepHistory(diff, offset) {
+  syncActiveWordFromUI();
   const word = currentActiveWord.word;
-  const pool = wordSentenceHistory[word] || [];
+  const pool = historyPool(word, diff);
   if (pool.length <= 1) return;
-
-  currentHistoryIndex = (currentHistoryIndex + offset + pool.length) % pool.length;
-  const item = pool[currentHistoryIndex];
-  currentActiveWord.sentence_zh = item.sentence_zh;
-  currentActiveWord.sentence_py = item.sentence_py;
-  currentActiveWord.sentence_en = item.sentence_en;
-  currentActiveWord.sentence_native = item.sentence_native;
+  const key = `${word}|${diff}`;
+  const idx = ((historyIndex[key] || 0) + offset + pool.length) % pool.length;
+  historyIndex[key] = idx;
+  currentActiveWord.sentences[diff] = { ...pool[idx] };
+  applyMainSentence(currentActiveWord);
   updateCardUI();
-  showToast(`已调出第 ${currentHistoryIndex + 1} 句（${item.scenario || '历史'}）`);
+  syncNotebookEntryFromCard();
 }
 
-// 请求 AI 换例句（携带已有句避重列表与指定语境）
-async function requestAiSentence(word, pinyin, baseEnglish, targetLang, engine, isRegen = false) {
+// 老师点「用这句」：复制整张卡、进生词本、导出长图都改用这一档
+function useSentence(diff) {
+  syncActiveWordFromUI();
+  if (!currentActiveWord.sentences[diff] || !currentActiveWord.sentences[diff].zh) {
+    showToast(`${DIFF_NAMES[diff]}还是空的`);
+    return;
+  }
+  currentActiveWord.main_diff = diff;
+  applyMainSentence(currentActiveWord);
+  updateCardUI();
+  syncNotebookEntryFromCard();
+  showToast(`复制和生词本改用${DIFF_NAMES[diff]}`);
+}
+
+function copySentenceLevel(diff) {
+  syncActiveWordFromUI();
+  const s = currentActiveWord.sentences[diff];
+  if (!s || !s.zh) { showToast(`${DIFF_NAMES[diff]}还是空的`); return; }
+  copyToClipboard(getFormattedSentence({
+    sentence_zh: s.zh, sentence_py: s.py, sentence_en: s.en, sentence_native: s.native
+  }), `${DIFF_NAMES[diff]}已复制！`);
+}
+
+// 请求 AI 出某一档的例句（带上这个词三档出过的所有句子排重）
+async function requestAiSentence(diff, isRegen = false) {
+  const word = currentActiveWord.word;
+  const seq = ++sentReqSeq;
+  sentPending[diff] = seq;
+  sentFailed[diff] = false;
+  updateSentenceStatusUI();
+  const engine = $('#engineSelect').value;
   try {
-    $('#btnAiRegen').querySelector('span').textContent = "生成中...";
-
-    // 提取所有已经生成过的例句，传给后端绝对排重
-    const pool = wordSentenceHistory[word] || [];
-    const avoidList = pool.map(s => s.sentence_zh).filter(Boolean);
-
+    const avoidList = DIFFS.flatMap(d => historyPool(word, d).map(s => s.zh)).filter(Boolean);
     const res = await fetch(`${API}/api/generate_sentence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         word,
-        pinyin,
-        english: baseEnglish,
-        target_lang: targetLang,
-        engine: engine,
-        difficulty: currentDifficulty || 'medium',
+        pinyin: currentActiveWord.pinyin,
+        english: currentActiveWord.english,
+        target_lang: $('#targetLangSelect').value,
+        engine,
+        difficulty: diff,
         avoid_sentences: avoidList,
         scenario: currentSelectedScenario
       })
     });
     const data = await res.json();
-    if (data && data.ok && data.data) {
-      if (data.data.english) currentActiveWord.english = data.data.english;
-      if (data.data.native_def) currentActiveWord.native_def = data.data.native_def;
-      if (data.data.sentence_zh) currentActiveWord.sentence_zh = data.data.sentence_zh;
-      if (data.data.sentence_py) currentActiveWord.sentence_py = data.data.sentence_py;
-      if (data.data.sentence_en) currentActiveWord.sentence_en = data.data.sentence_en;
-      if (data.data.sentence_native) currentActiveWord.sentence_native = data.data.sentence_native;
-
-      recordSentenceHistory(
-        currentActiveWord.sentence_zh,
-        currentActiveWord.sentence_py,
-        currentActiveWord.sentence_en,
-        currentActiveWord.sentence_native,
-        currentSelectedScenario || "综合"
-      );
-
+    if (currentActiveWord.word !== word || sentPending[diff] !== seq) return;   // 已经查了别的词／又点了一次，这条作废
+    if (data && data.ok && data.data && data.data.sentence_zh) {
+      syncActiveWordFromUI();   // 老师可能正在改别的框，先收下她改的
+      const d = data.data;
+      // 释义三档都会带回来，只在还是占位时收第一份，免得来回闪
+      if (d.english && (!currentActiveWord._defsFromAi)) currentActiveWord.english = d.english;
+      if (d.native_def && (!currentActiveWord._defsFromAi)) currentActiveWord.native_def = d.native_def;
+      if (d.english || d.native_def) currentActiveWord._defsFromAi = true;
+      const sent = { zh: d.sentence_zh, py: d.sentence_py || '', en: d.sentence_en || '', native: d.sentence_native || '' };
+      currentActiveWord.sentences[diff] = sent;
+      recordSentenceHistory(diff, sent);
+      applyMainSentence(currentActiveWord);
+      sentPending[diff] = 0;
       updateCardUI();
       syncNotebookEntryFromCard();
-      const usedNote = (data.data && data.engine_used && data.engine_used !== engine)
-        ? `（实际用的是 ${data.engine_used}）` : "";
-      showToast((isRegen ? `已换新例句（${currentSelectedScenario || '全新语境'}）` : `已生成双语词条`) + usedNote);
+      const usedNote = (data.engine_used && data.engine_used !== engine) ? `（实际用的是 ${data.engine_used}）` : "";
+      if (isRegen) showToast(`已换新的${DIFF_NAMES[diff]}${usedNote}`);
+      else if (diff === 'medium') showToast(`已生成双语词条${usedNote}`);
     } else {
-      /* 2026-09-03 加（小克，K525 第 11 条）：原来只有成功分支。后端返回 ok:false
-         （没配 key、超时、模型报错）时既没提示也不兜底——老师课上点「换例句」，
-         按钮转一圈、句子纹丝不动、没有任何解释。 */
-      showToast(`例句生成失败：${(data && data.error) || '未知原因'}，已切回离线句式`);
-      cycleOfflineSentence();
+      sentFailed[diff] = true;
+      showToast(`${DIFF_NAMES[diff]}生成失败：${(data && data.error) || '未知原因'}，点「换一句」重试`);
     }
   } catch (e) {
-    showToast(`例句请求出错：${e.message || e.name}，已切回离线句式`);
-    cycleOfflineSentence();
+    if (currentActiveWord.word !== word || sentPending[diff] !== seq) return;
+    sentFailed[diff] = true;
+    showToast(`${DIFF_NAMES[diff]}请求出错：${e.message || e.name}，点「换一句」重试`);
   } finally {
-    $('#btnAiRegen').querySelector('span').textContent = "换例句";
+    if (sentPending[diff] === seq) sentPending[diff] = 0;
+    updateSentenceStatusUI();
   }
+}
+
+// 各档按钮文字、空框提示、前后翻看
+function updateSentenceStatusUI() {
+  const offline = !isServerOnline || $('#engineSelect').value === 'offline';
+  DIFFS.forEach(d => {
+    const busy = !!sentPending[d];
+    const btn = $(`#btnRegen_${d}`);
+    if (btn) { btn.textContent = busy ? '生成中…' : '换一句'; btn.disabled = busy; }
+    const zh = $(`#sentZh_${d}`);
+    if (zh) zh.placeholder = busy ? '正在生成…'
+      : sentFailed[d] ? '没生成出来，点「换一句」重试'
+      : offline ? '离线状态：点「换一句」出离线句式' : '点「换一句」生成';
+    const word = currentActiveWord.word;
+    const pool = historyPool(word, d);
+    const stepper = $(`#stepper_${d}`);
+    if (stepper) {
+      stepper.style.display = pool.length > 1 ? 'flex' : 'none';
+      $(`#histIdx_${d}`).textContent = `${(historyIndex[`${word}|${d}`] || 0) + 1}/${pool.length}`;
+    }
+  });
+  const anyBusy = DIFFS.some(d => sentPending[d]);
+  $('#btnAiRegen').querySelector('span').textContent = anyBusy ? "生成中…" : "三档都换";
 }
 
 /* 2026-09-03 加（小克）：textarea 自动贴合内容高度，长拼音不再被裁。 */
@@ -2937,31 +3077,46 @@ if (typeof ResizeObserver !== "undefined") {
 }
 
 function updateCardUI() {
+  ensureSentences(currentActiveWord);
   $('#displayHanzi').textContent = currentActiveWord.word;
   $('#displayPinyin').textContent = currentActiveWord.pinyin;
   $('#displayEnglish').value = currentActiveWord.english;
   $('#displayNativeDef').value = currentActiveWord.native_def || '';
   $('#displayHsk').textContent = currentActiveWord.hsk ? `HSK ${currentActiveWord.hsk}` : '拓展词';
-  $('#displaySentZh').value = currentActiveWord.sentence_zh;
-  $('#displaySentPy').value = currentActiveWord.sentence_py;
-  $('#displaySentEn').value = currentActiveWord.sentence_en;
-  $('#displaySentNative').value = currentActiveWord.sentence_native || '';
-  autoGrowAll();   // 2026-09-03：内容换了要重算高度，否则还是按旧内容的高度显示
+  DIFFS.forEach(d => {
+    const s = currentActiveWord.sentences[d];
+    $(`#sentZh_${d}`).value = s.zh || '';
+    $(`#sentPy_${d}`).value = s.py || '';
+    $(`#sentEn_${d}`).value = s.en || '';
+    $(`#sentNative_${d}`).value = s.native || '';
+    const isMain = currentActiveWord.main_diff === d;
+    $(`#sentBox_${d}`).classList.toggle('is-main', isMain);
+    const use = $(`#btnUse_${d}`);
+    use.classList.toggle('on', isMain);
+    use.textContent = isMain ? '✓ 在用' : '用这句';
+  });
+  autoGrowAll();   // 内容换了要重算高度，否则还是按旧内容的高度显示
 
   const isCollected = currentVocabList.some(item => item.word === currentActiveWord.word);
   $('#btnCollect').classList.toggle('collected', isCollected);
   $('#btnCollectText').textContent = isCollected ? "更新到生词本" : "收藏到生词本";
 
-  updateHistoryStepperUI();
+  updateSentenceStatusUI();
 }
 
 function syncActiveWordFromUI() {
+  ensureSentences(currentActiveWord);
   currentActiveWord.english = $('#displayEnglish').value.trim();
   currentActiveWord.native_def = $('#displayNativeDef').value.trim();
-  currentActiveWord.sentence_zh = $('#displaySentZh').value.trim();
-  currentActiveWord.sentence_py = $('#displaySentPy').value.trim();
-  currentActiveWord.sentence_en = $('#displaySentEn').value.trim();
-  currentActiveWord.sentence_native = $('#displaySentNative').value.trim();
+  DIFFS.forEach(d => {
+    currentActiveWord.sentences[d] = {
+      zh: $(`#sentZh_${d}`).value.trim(),
+      py: $(`#sentPy_${d}`).value.trim(),
+      en: $(`#sentEn_${d}`).value.trim(),
+      native: $(`#sentNative_${d}`).value.trim()
+    };
+  });
+  applyMainSentence(currentActiveWord);
 }
 
 function quickLookup(w) {
@@ -3059,7 +3214,8 @@ function renderVocabList() {
 function loadWordFromList(idx) {
   const item = currentVocabList[idx];
   if (!item) return;
-  currentActiveWord = { ...item };
+  currentActiveWord = JSON.parse(JSON.stringify(item));
+  ensureSentences(currentActiveWord);
   updateCardUI();
   showToast(`已加载生词【${item.word}】`);
 }
@@ -3662,14 +3818,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. 发音
   $('#btnAudioWord').addEventListener('click', () => speak($('#displayHanzi').textContent));
   $('#displayHanzi').addEventListener('click', () => speak($('#displayHanzi').textContent));
-  $('#btnAudioSent').addEventListener('click', () => speak($('#displaySentZh').value));
 
-  // 4. AI 换例句主按钮
-  $('#btnAiRegen').addEventListener('click', triggerRegenSentence);
-
-  // 5. 例句历史前后步进按钮
-  $('#btnPrevSentence').addEventListener('click', () => stepHistory(-1));
-  $('#btnNextSentence').addEventListener('click', () => stepHistory(1));
+  // 4. 三档都换（单档的换一句／前后翻看／用这句写在各框的 onclick 上）
+  $('#btnAiRegen').addEventListener('click', () => triggerRegenSentence());
 
   // 6. 一键复制
   $('#btnCopyFull').addEventListener('click', () => {
