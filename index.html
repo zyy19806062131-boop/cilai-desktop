@@ -938,7 +938,7 @@ main {
 
 /* 核心操作按钮组 */
 .card-actions {
-  padding: 16px 24px;
+  padding: 14px 24px;
   background: var(--panel-alt);
   border-top: 1px solid var(--line);
   display: flex;
@@ -969,25 +969,6 @@ main {
 }
 .copy-btn-primary:active { transform: translateY(1px); }
 
-.collect-btn {
-  background: var(--gold);
-  color: #fff;
-  font-size: 14.5px;
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.15s;
-}
-.collect-btn:hover { background: #9e7121; transform: translateY(-1.5px); }
-.collect-btn:active { transform: translateY(1px); }
-.collect-btn.collected {
-  background: var(--accent);
-}
 
 .copy-presets {
   display: flex;
@@ -1032,6 +1013,13 @@ main {
 .list-footer {
   flex: 0 0 auto;
 }
+.list-footer { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px !important; }
+.footer-btn { justify-content: center; gap: 5px; padding: 10px 6px !important; font-size: 13px; font-weight: 600; white-space: nowrap; min-width: 0; }
+.footer-btn .c4d-icon, .footer-btn .c4d-png-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.nb-date-select { border: none; border-left: 1px solid var(--line); border-right: 1px solid var(--line); background: transparent;
+  font-size: 12px; color: var(--ink-soft); padding: 4px 6px; cursor: pointer; outline: none; font-family: inherit; }
+.nb-date-select.active { background: var(--primary); color: #fff; }
+.vocab-item-del { padding: 4px 6px !important; }
 .list-header {
   padding: 15px 18px;
   border-bottom: 1px solid var(--line);
@@ -1255,38 +1243,6 @@ main {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-.export-option-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  background: var(--panel-alt);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  transition: 0.15s;
-}
-.export-option-card:hover {
-  border-color: var(--primary);
-  background: var(--panel);
-}
-.export-option-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.export-option-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.export-option-desc {
-  font-size: 13px;
-  color: var(--ink-soft);
 }
 .preview-text-box {
   background: var(--panel-alt);
@@ -1606,32 +1562,17 @@ main {
       </div>
 
       <div class="card-actions">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <button class="copy-btn-primary" id="btnCopyFull" title="复制整张卡（翻译+例句，快捷键: Cmd+C）">
-            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-              <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
-              <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
-              <rect x="15" y="22" width="18" height="2.5" rx="1.2" fill="#e8c3b0"/>
-              <rect x="15" y="27.5" width="14" height="2.5" rx="1.2" fill="#e8c3b0"/>
-              <rect x="17" y="5" width="14" height="8" rx="4" fill="#ffdf73"/>
-            </svg>
-            <span>复制整张卡</span>
-            <span class="kbd-hint">⌘C</span>
-          </button>
-          <button class="collect-btn" id="btnCollect" title="收藏到生词本 (快捷键: Cmd+S)">
-            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-              <path d="M24 4 C24.8 4, 25.5 4.5, 25.9 5.3 L30.5 14.8 C30.8 15.4, 31.4 15.9, 32.1 16 L42.5 17.5 C43.4 17.6, 44.2 18.3, 44.4 19.2 C44.6 20.1, 44.2 21, 43.5 21.6 L36 29 C35.5 29.5, 35.3 30.2, 35.4 30.9 L37.2 41.2 C37.4 42.1, 37 43, 36.3 43.5 C35.5 44, 34.6 44, 33.8 43.5 L24.6 38.6 C24 38.3, 23.3 38.3, 22.7 38.6 L13.5 43.5 C12.7 44, 11.8 44, 11 43.5 C10.3 43, 9.9 42.1, 10.1 41.2 L11.9 30.9 C12 30.2, 11.8 29.5, 11.3 29 L3.8 21.6 C3.1 21, 2.7 20.1, 2.9 19.2 C3.1 18.3, 3.9 17.6, 4.8 17.5 L15.2 16 C15.9 15.9, 16.5 15.4, 16.8 14.8 L21.4 5.3 C21.8 4.5, 22.5 4, 23.3 4 Z" fill="url(#c4d-grad-star)"/>
-            </svg>
-            <span id="btnCollectText">收藏到生词本</span>
-            <span class="kbd-hint">⌘S</span>
-          </button>
-        </div>
-
-        <div class="copy-presets">
-          <span style="font-size:12px;color:var(--ink-dim)">快捷复制:</span>
-          <button class="copy-chip" id="btnCopyMinimal" title="只复制词语、拼音和释义">仅翻译</button>
-          <button class="copy-chip" id="btnCopySentence" title="只复制中文例句及其对照翻译">仅例句</button>
-        </div>
+        <button class="copy-btn-primary" id="btnCopyFull" title="复制汉字＋拼音＋翻译（快捷键 ⌘C）">
+          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
+            <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
+            <rect x="15" y="22" width="18" height="2.5" rx="1.2" fill="#e8c3b0"/>
+            <rect x="15" y="27.5" width="14" height="2.5" rx="1.2" fill="#e8c3b0"/>
+            <rect x="17" y="5" width="14" height="8" rx="4" fill="#ffdf73"/>
+          </svg>
+          <span>复制</span>
+          <span class="kbd-hint">⌘C</span>
+        </button>
       </div>
     </div>
   </section>
@@ -1786,42 +1727,36 @@ main {
           <span class="list-count-badge" id="vocabCount">0</span>
         </div>
         <div class="list-tools">
-          <div class="nb-filter" id="nbFilter" title="今天＝只看课程日期这天加的词；全部＝这个学生历来所有的词">
-            <button type="button" class="nb-filter-btn active" data-f="today">今天</button>
+          <div class="nb-filter" id="nbFilter" title="今天＝顶栏课程日期这天加的词；中间可以挑某一天；全部＝这个学生历来所有的词">
+            <button type="button" class="nb-filter-btn" data-f="today">今天</button>
+            <select class="nb-date-select" id="nbDateSelect" title="看某一天加的词"></select>
             <button type="button" class="nb-filter-btn" data-f="all">全部</button>
           </div>
-          <label class="nb-switch" title="开着：查过的词自动进当前学生的生词本；关掉：要手动点「收藏」">
-            <input type="checkbox" id="autoCollectToggle" checked><span>搜过即收</span>
-          </label>
-          <button class="btn btn-secondary btn-sm" id="btnClearList" title="清空当前显示的这些词">清空</button>
         </div>
       </div>
 
       <div class="list-body" id="vocabListContainer"></div>
 
       <div class="list-footer">
-        <!-- AI 一键生成练习按钮 -->
-        <button class="btn btn-accent" id="btnOpenExerciseModal" style="padding:10px;font-weight:600;">
+        <!-- 2026-09-28 老师：右下只留三个按钮并排 -->
+        <button class="btn btn-accent footer-btn" id="btnOpenExerciseModal" title="用当前显示的这些词出随堂练习">
           <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
             <circle cx="24" cy="24" r="20" fill="url(#c4d-grad-pencil)"/>
             <path d="M16 32 L32 16 M28 12 L36 20" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
           </svg>
-          <span>AI 一键生成随堂练习</span>
+          <span>生成练习</span>
         </button>
-
-        <!-- 课后导出复习图按钮 -->
-        <button class="generate-card-btn" id="btnOpenExportModal">
-          <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡" onerror="this.style.display='none'">
-          <span>下课后一键导出复习图</span>
+        <button class="btn btn-primary footer-btn" id="btnExportVocabImage" title="当前显示的这些词画成一张复习长图（PNG）">
+          <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="" onerror="this.style.display='none'">
+          <span>导出图片</span>
         </button>
-
-        <button class="btn btn-secondary" id="btnCopySummary">
+        <button class="btn btn-secondary footer-btn" id="btnCopySummary" title="复制发给学生的课后总结消息">
           <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
             <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
             <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
             <rect x="15" y="22" width="18" height="2.5" rx="1.2" fill="#e8c3b0"/>
           </svg>
-          <span>复制整节课总结</span>
+          <span>复制总结</span>
         </button>
       </div>
     </div>
@@ -1948,55 +1883,6 @@ main {
   </div>
 </div>
 
-<!-- 模态框 2：课后复习导出中心 -->
-<div class="modal-overlay" id="exportModal">
-  <div class="modal-window">
-    <div class="modal-header">
-      <h3>
-        <img src="assets/icons/classroom.png" class="c4d-png-icon" alt="闪卡">
-        <span>课后复习资料导出（图片）</span>
-      </h3>
-      <button class="btn btn-secondary btn-sm" id="btnCloseModal" style="padding:4px 8px;border-radius:50%;">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1 L11 11 M11 1 L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="export-option-card">
-        <div class="export-option-info">
-          <div class="export-option-title">
-            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-              <rect x="14" y="6" width="28" height="34" rx="7" fill="url(#c4d-grad-cardback)" transform="rotate(10 28 23)"/>
-              <rect x="7" y="8" width="28" height="34" rx="7" fill="#ffffff" stroke="#e3dcd3" stroke-width="1.5"/>
-              <circle cx="21" cy="21" r="3.5" fill="#c25220"/>
-            </svg>
-            <span>导出生词复习长图 (.png)</span>
-          </div>
-          <div class="export-option-desc">整节课生词画成一张长图：中文、拼音、英文释义、母语二翻、例句。存好直接发给学生。</div>
-        </div>
-        <button class="btn btn-primary" id="btnExportVocabImage">导出长图</button>
-      </div>
-
-      <div class="export-option-card">
-        <div class="export-option-info">
-          <div class="export-option-title">
-            <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-              <rect x="7" y="9" width="34" height="36" rx="8" fill="url(#c4d-grad-clip)"/>
-              <rect x="11" y="14" width="26" height="27" rx="5" fill="url(#c4d-grad-paper)"/>
-            </svg>
-            <span>复制课后总结消息</span>
-          </div>
-          <div class="export-option-desc">格式化整节课生词与例句（英文+二翻对照），排版整洁，直接在聊天窗口中粘贴发送。</div>
-        </div>
-        <button class="btn btn-secondary" id="btnCopySummaryMessage">一键复制消息</button>
-      </div>
-
-      <div class="field-group" style="margin-top:6px;">
-        <div class="field-label">课后总结消息预览：</div>
-        <div class="preview-text-box" id="summaryPreviewText"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="toast">已复制到剪贴板，可直接粘贴！</div>
 
@@ -2024,12 +1910,15 @@ const currentStudent = () => $('#studentName').value.trim();
 const currentLessonDate = () => $('#lessonDate').value.trim() || todayStr;
 const getStorageKey = () => `cilai_nb_${currentStudent() || 'default'}`;
 const getStudentLangKey = () => `cilai_student_lang_${currentStudent() || 'default'}`;
+// 生词本筛选：'today'＝顶栏课程日期那天；'all'；或者直接是某个日期 'YYYY-MM-DD'（右栏中间的日期下拉）
 let nbFilter = localStorage.getItem('cilai_nb_filter') || 'today';
-const autoCollectOn = () => localStorage.getItem('cilai_auto_collect') !== '0';
+if (!/^(today|all|\d{4}-\d{2}-\d{2})$/.test(nbFilter)) nbFilter = 'today';
+// 2026-09-28 老师把右栏开关都拿掉了：查过就收，一直开着
+const autoCollectOn = () => true;
 let students = [];
 function visibleVocab() {
   if (nbFilter === 'all') return currentVocabList.slice();
-  const d = currentLessonDate();
+  const d = nbFilter === 'today' ? currentLessonDate() : nbFilter;
   return currentVocabList.filter(it => (it.added || '') === d);
 }
 function escapeHtml(v) {
@@ -3097,10 +2986,6 @@ function updateCardUI() {
   });
   autoGrowAll();   // 内容换了要重算高度，否则还是按旧内容的高度显示
 
-  const isCollected = currentVocabList.some(item => item.word === currentActiveWord.word);
-  $('#btnCollect').classList.toggle('collected', isCollected);
-  $('#btnCollectText').textContent = isCollected ? "更新到生词本" : "收藏到生词本";
-
   updateSentenceStatusUI();
 }
 
@@ -3149,15 +3034,29 @@ function getFormattedMinimal(item) {
 function getFormattedSentence(item) {
   const lang = $('#targetLangSelect').value;
   const hasSecond = (lang !== '英语' && item.sentence_native);
-  if (hasSecond) {
-    return `${item.sentence_zh}\nEN: ${item.sentence_en}\n${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`;
-  } else {
-    return `${item.sentence_zh} (${item.sentence_en})`;
-  }
+  // 2026-09-28 老师：中栏每档的复制＝例句＋拼音＋翻译
+  const lines = [item.sentence_zh];
+  if (item.sentence_py) lines.push(item.sentence_py);
+  if (item.sentence_en) lines.push(`EN: ${item.sentence_en}`);
+  if (hasSecond) lines.push(`${lang.substring(0,2).toUpperCase()}: ${item.sentence_native}`);
+  return lines.join('\n');
 }
 
 /* ================= 今日生词本操作 ================= */
+// 右栏顶上的日期下拉：列出这个学生生词本里出现过的日期，新的在上
+function renderNbFilterUI() {
+  const sel = $('#nbDateSelect');
+  const dates = [...new Set(currentVocabList.map(it => it.added).filter(Boolean))].sort().reverse();
+  const picked = /^\d{4}-\d{2}-\d{2}$/.test(nbFilter) ? nbFilter : '';
+  if (picked && !dates.includes(picked)) dates.unshift(picked);
+  sel.innerHTML = `<option value="">选日期</option>` + dates.map(d => `<option value="${d}">${d.slice(5)}</option>`).join('');
+  sel.value = picked;
+  sel.classList.toggle('active', !!picked);
+  document.querySelectorAll('#nbFilter .nb-filter-btn').forEach(x => x.classList.toggle('active', x.dataset.f === nbFilter));
+}
+
 function renderVocabList() {
+  renderNbFilterUI();
   const container = $('#vocabListContainer');
   const vis = visibleVocab();
   const total = currentVocabList.length;
@@ -3167,8 +3066,8 @@ function renderVocabList() {
   if (vis.length === 0) {
     let tip;
     if (!name) tip = `还没有学生<br>点顶栏「<b>＋</b>」添加一个学生<br>之后查过的词会自动进 ta 的生词本`;
-    else if (total && nbFilter === 'today') tip = `${currentLessonDate()} 这天还没加词<br>${escapeHtml(name)} 一共有 <b>${total}</b> 个词，切「<b>全部</b>」可见<br>在左侧查词，查过就自动收进来`;
-    else tip = `${escapeHtml(name)} 的生词本还是空的<br>在左侧查词，<b>查过就自动收进来</b><br>下课后点下方一键导出复习图`;
+    else if (total && nbFilter !== 'all') tip = `${nbFilter === 'today' ? currentLessonDate() : nbFilter} 这天还没加词<br>${escapeHtml(name)} 一共有 <b>${total}</b> 个词，切「<b>全部</b>」可见<br>在左侧查词，查过就自动收进来`;
+    else tip = `${escapeHtml(name)} 的生词本还是空的<br>在左侧查词，<b>查过就自动收进来</b><br>下课后点下方「导出图片」`;
     container.innerHTML = `<div class="empty-tip" id="emptyTip">${tip}</div>`;
     return;
   }
@@ -3182,28 +3081,16 @@ function renderVocabList() {
       lastDate = item.added;
       head = `<div class="nb-date-head">${escapeHtml(item.added || '未记日期')}</div>`;
     }
-    const dualDef = item.native_def ? `EN: ${item.english} | 二翻: ${item.native_def}` : item.english;
     return head + `
     <div class="vocab-item" data-idx="${idx}">
       <div class="vocab-item-main" onclick="loadWordFromList(${idx})">
         <div class="vocab-item-top">
-          <span class="vocab-item-word">${item.word}</span>
-          <span class="vocab-item-py">${item.pinyin}</span>
-          ${item.hsk ? `<span class="word-badge" style="font-size:10px;">H${item.hsk}</span>` : ''}
+          <span class="vocab-item-word">${escapeHtml(item.word)}</span>
+          <span class="vocab-item-py">${escapeHtml(item.pinyin)}</span>
         </div>
-        <div class="vocab-item-dual">${dualDef}</div>
       </div>
       <div class="vocab-item-actions">
-        <button class="audio-btn" onclick="speakVocabItem(${idx})" title="发音">
-          <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
-            <rect x="6" y="16" width="10" height="16" rx="5" fill="url(#c4d-grad-spk)"/>
-            <path d="M14 18 C14 14, 22 8, 28 8 C30 8, 32 10, 32 13 L32 35 C32 38, 30 40, 28 40 C22 40, 14 34, 14 30 Z" fill="url(#c4d-grad-cone)"/>
-            <ellipse cx="32" cy="24" rx="2.5" ry="12" fill="#ffcca6"/>
-          </svg>
-        </button>
-        <button class="copy-list-btn" onclick="copyItemTranslation(${idx})" title="只复制翻译">译</button>
-        <button class="copy-list-btn" onclick="copyItemSentence(${idx})" title="只复制例句">句</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteItem(${idx})" title="删除" style="padding:4px 6px;">
+        <button class="btn btn-danger btn-sm vocab-item-del" onclick="deleteItem(${idx})" title="从生词本删掉">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -3218,27 +3105,6 @@ function loadWordFromList(idx) {
   ensureSentences(currentActiveWord);
   updateCardUI();
   showToast(`已加载生词【${item.word}】`);
-}
-
-function copyItem(idx) {
-  const item = currentVocabList[idx];
-  if (!item) return;
-  copyToClipboard(getFormattedFull(item));
-}
-
-function copyItemTranslation(idx) {
-  const item = currentVocabList[idx];
-  if (!item) return;
-  copyToClipboard(getFormattedMinimal(item), "翻译已复制！");
-}
-
-function copyItemSentence(idx) {
-  const item = currentVocabList[idx];
-  if (!item || !item.sentence_zh) {
-    showToast("这条生词还没有例句");
-    return;
-  }
-  copyToClipboard(getFormattedSentence(item), "例句已复制！");
 }
 
 function deleteItem(idx) {
@@ -3430,10 +3296,6 @@ function renderExercises(exercises) {
    onclick="checkAnswer(${idx}, '${opt}', '${ex.answer}', this)"——把模型输出拼进单引号 JS 字符串。
    外语选项只要带一个撇号（l'école、d'accord）整个 onclick 就是语法错，按钮点了没反应。
    改成只传下标，值一律从 currentExercises 取。 */
-function speakVocabItem(idx) {
-  const item = currentVocabList[idx];
-  if (item && item.word) speak(item.word);
-}
 function escHtml(s) {
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -3822,55 +3684,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 4. 三档都换（单档的换一句／前后翻看／用这句写在各框的 onclick 上）
   $('#btnAiRegen').addEventListener('click', () => triggerRegenSentence());
 
-  // 6. 一键复制
+  // 6. 左栏复制：汉字＋拼音＋翻译（2026-09-28 老师：左下只留这一个）
   $('#btnCopyFull').addEventListener('click', () => {
     syncActiveWordFromUI();
-    copyToClipboard(getFormattedFull(currentActiveWord), "双语生词卡已复制到剪贴板！");
+    copyToClipboard(getFormattedMinimal(currentActiveWord), "汉字、拼音、翻译已复制！");
   });
 
-  $('#btnCopyMinimal').addEventListener('click', () => {
-    syncActiveWordFromUI();
-    copyToClipboard(getFormattedMinimal(currentActiveWord), "精简双语已复制！");
-  });
 
-  $('#btnCopySentence').addEventListener('click', () => {
-    syncActiveWordFromUI();
-    copyToClipboard(getFormattedSentence(currentActiveWord), "仅例句已复制！");
-  });
 
-  // 7. 收藏到今日生词本
-  $('#btnCollect').addEventListener('click', () => {
-    syncActiveWordFromUI();
-    const idx = currentVocabList.findIndex(item => item.word === currentActiveWord.word);
-    if (idx >= 0) {
-      currentVocabList[idx] = { ...currentVocabList[idx], ...currentActiveWord };   // 保住 added 日期
-      showToast(`已更新生词本中的【${currentActiveWord.word}】`);
-    } else {
-      currentVocabList.push({ ...currentActiveWord, added: currentLessonDate() });
-      showToast(`已收藏【${currentActiveWord.word}】到 ${currentStudent() || '默认'} 的生词本`);
-    }
-    saveList();
-    updateCardUI();
-  });
-
-  // 8. 清空生词本
-  $('#btnClearList').addEventListener('click', () => {
-    const vis = visibleVocab();
-    if (!vis.length) return;
-    const scope = nbFilter === 'all'
-      ? `${currentStudent()} 的全部 ${vis.length} 个生词`
-      : `${currentLessonDate()} 这天的 ${vis.length} 个生词`;
-    if (confirm(`确定清空${scope}吗？`)) {
-      const gone = new Set(vis);
-      currentVocabList = currentVocabList.filter(it => !gone.has(it));
-      currentExercises = [];
-      saveList();
-      showToast("已清空");
-      updateCardUI();
-    }
-  });
-
-  // 9. 学生切换 / 增删、日期、筛选、搜过即收开关（2026-09-06 K623）
+  // 9. 学生切换 / 增删、日期、筛选（2026-09-06 K623）
   $('#studentSelect').addEventListener('change', e => switchStudent(e.target.value));
   $('#lessonDate').addEventListener('change', () => { renderVocabList(); updateCardUI(); });
   $('#btnAddStudent').addEventListener('click', openStudentModal);
@@ -3882,20 +3704,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (await addStudent($('#inputNewStudentName').value)) $('#studentModal').classList.remove('active');
   });
   $('#inputNewStudentName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnConfirmAddStudent').click(); });
+  const setNbFilter = f => {
+    nbFilter = f;
+    try { localStorage.setItem('cilai_nb_filter', nbFilter); } catch(e2) {}
+    renderVocabList();
+  };
   $('#nbFilter').addEventListener('click', e => {
     const b = e.target.closest('.nb-filter-btn');
-    if (!b) return;
-    nbFilter = b.dataset.f;
-    try { localStorage.setItem('cilai_nb_filter', nbFilter); } catch(e2) {}
-    document.querySelectorAll('#nbFilter .nb-filter-btn').forEach(x => x.classList.toggle('active', x === b));
-    renderVocabList();
+    if (b) setNbFilter(b.dataset.f);
   });
-  $('#autoCollectToggle').checked = autoCollectOn();
-  $('#autoCollectToggle').addEventListener('change', e => {
-    try { localStorage.setItem('cilai_auto_collect', e.target.checked ? '1' : '0'); } catch(e2) {}
-    showToast(e.target.checked ? '搜过即收已开：查到的词自动进生词本' : '搜过即收已关：要手动点「收藏」');
-  });
-  document.querySelectorAll('#nbFilter .nb-filter-btn').forEach(x => x.classList.toggle('active', x.dataset.f === nbFilter));
+  $('#nbDateSelect').addEventListener('change', e => setNbFilter(e.target.value || 'today'));
 
   // 10. AI 一键生成随堂练习
   $('#btnOpenExerciseModal').addEventListener('click', triggerGenerateExercises);
@@ -3922,27 +3740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('#btnRegenExercises').addEventListener('click', triggerGenerateExercises);
 
-  // 11. 课后导出中心模态框
-  $('#btnOpenExportModal').addEventListener('click', () => {
-    if (!visibleVocab().length) {
-      showToast("请先在左侧收藏一些生词再导出复习图");
-      return;
-    }
-    updateSummaryPreviewText();
-    $('#exportModal').classList.add('active');
-  });
-
-  $('#btnCloseModal').addEventListener('click', () => {
-    $('#exportModal').classList.remove('active');
-  });
-
-  $('#exportModal').addEventListener('click', e => {
-    if (e.target === $('#exportModal')) {
-      $('#exportModal').classList.remove('active');
-    }
-  });
-
-  // 12. 导出生词复习长图（PNG）
+  // 11. 右下「导出图片」：当前显示的这些词直接画成复习长图（PNG）
   $('#btnExportVocabImage').addEventListener('click', exportVocabImage);
 
   // 13. 复制课后总结消息 (双语对照)
@@ -3971,19 +3769,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return lines.join('\n');
   }
 
-  function updateSummaryPreviewText() {
-    $('#summaryPreviewText').textContent = generateSummaryText();
-  }
-
   $('#btnCopySummary').addEventListener('click', () => {
     if (!visibleVocab().length) {
       showToast("当前生词本为空");
       return;
     }
-    copyToClipboard(generateSummaryText(), "课后总结已复制到剪贴板！");
-  });
-
-  $('#btnCopySummaryMessage').addEventListener('click', () => {
     copyToClipboard(generateSummaryText(), "课后总结已复制到剪贴板！");
   });
 
@@ -3996,7 +3786,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 16. 快捷键
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      $('#exportModal').classList.remove('active');
       $('#exerciseModal').classList.remove('active');
     }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && window.getSelection().toString() === '') {
@@ -4004,10 +3793,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         $('#btnCopyFull').click();
       }
-    }
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
-      e.preventDefault();
-      $('#btnCollect').click();
     }
     if (e.key === '/' && document.activeElement !== $('#wordInput') && document.activeElement.tagName !== 'INPUT') {
       e.preventDefault();
