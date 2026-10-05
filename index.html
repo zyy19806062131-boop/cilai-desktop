@@ -1450,7 +1450,7 @@ main {
       <span class="session-info-label">引擎:</span>
       <select id="engineSelect">
         <option value="deepseek">DeepSeek (智能出题/例句 · 推荐)</option>
-        <option value="qwen">通义千问 (极速直连)</option>
+        <option value="hub">本机模型中心 Gemini</option>
         <option value="google_v3">Google Cloud Translation</option>
         <option value="gemini">Google Gemini (多语言)</option>
         <option value="offline">纯离线词库 (19.8万词)</option>
@@ -1813,14 +1813,6 @@ main {
 
       <div class="field-group">
         <label class="field-label" style="font-size:13px;">
-          <span>通义千问 API Key (阿里百炼 DashScope)</span>
-          <a href="https://bailian.console.aliyun.com/" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px;">获取免费额度 ↗</a>
-        </label>
-        <input type="password" id="inputDashscopeKey" class="editable-field" placeholder="sk-..." autocomplete="off">
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" style="font-size:13px;">
           <span>Google Gemini API Key (可选)</span>
           <a href="https://aistudio.google.com/" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px;">免费申请 ↗</a>
         </label>
@@ -1967,7 +1959,7 @@ async function checkServer() {
          下拉框里它是灰的——状态条说有、选项说没有，自相矛盾。改成按真正能跑的引擎显示。 */
       const runnable = Array.isArray(data.engines)
         ? data.engines.filter(e => e !== 'offline')
-        : (data.has_dashscope ? ['qwen'] : []);
+        : (data.has_hub ? ['hub'] : []);
       $('#serverStatusTag').innerHTML = runnable.length
         ? `● 服务已就绪（${runnable.join(' / ')}）`
         : `● 服务已就绪（仅离线词库）`;
@@ -1984,7 +1976,7 @@ async function checkServer() {
             o.textContent = ok ? base : base + '（后端未实现）';
           });
           if (sel.selectedOptions[0]?.disabled) {
-            sel.value = data.engines.includes('qwen') ? 'qwen' : data.engines[0];
+            sel.value = data.engines.includes('hub') ? 'hub' : data.engines[0];
           }
         }
       }
@@ -3832,7 +3824,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 18. 设置弹窗逻辑
   $('#btnSettings').addEventListener('click', () => {
     $('#inputDeepseekKey').value = localStorage.getItem('cilai_deepseek_key') || '';
-    $('#inputDashscopeKey').value = localStorage.getItem('cilai_dashscope_key') || '';
     $('#inputGeminiKey').value = localStorage.getItem('cilai_gemini_key') || '';
     $('#inputVolcKey').value = localStorage.getItem('cilai_volc_key') || '';
     $('#settingsModal').classList.add('active');
@@ -3847,12 +3838,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('#btnSaveSettings').addEventListener('click', async () => {
     const deepseek = $('#inputDeepseekKey').value.trim();
-    const qwen = $('#inputDashscopeKey').value.trim();
     const gemini = $('#inputGeminiKey').value.trim();
     const volc = $('#inputVolcKey').value.trim();
 
     localStorage.setItem('cilai_deepseek_key', deepseek);
-    localStorage.setItem('cilai_dashscope_key', qwen);
     localStorage.setItem('cilai_gemini_key', gemini);
     localStorage.setItem('cilai_volc_key', volc);
 
@@ -3860,7 +3849,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await fetch(`${API}/api/save_keys`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deepseek_key: deepseek, dashscope_key: qwen, gemini_key: gemini, volc_key: volc })
+        body: JSON.stringify({ deepseek_key: deepseek, gemini_key: gemini, volc_key: volc })
       });
     } catch(e) {}
 

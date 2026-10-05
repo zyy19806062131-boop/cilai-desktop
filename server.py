@@ -187,7 +187,26 @@ def get_key_from_env_file(file_name, key_name):
             pass
     return ""
 
-DASHSCOPE_KEY = get_key_from_env_file("bailian.env", "DASHSCOPE_API_KEY")
+# 2026-10-05 百炼退役（老师「百炼弃用，全平台删」）：原来的「通义千问」引擎（百炼 qwen-turbo）删了，
+# 换成「hub」＝本机模型中心 8318 的 Gemini（老师自己的机器上才有；不要 key、不花钱）。
+# 回环请求不走系统代理（Shadowrocket 曾把 127.0.0.1 的请求挂断）。外部下载者的机器上没有中心，这个引擎自动置灰。
+HUB_URL = os.environ.get("MODEL_HUB", "http://127.0.0.1:8318").rstrip("/")
+HUB_MODEL = "gemini-3.5-flash-lite"
+_HUB_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+_hub_cache = [0.0, False]
+def hub_ok():
+    """模型中心在不在（缓存 60 秒，状态接口每次都问，不能每次都等）。"""
+    import time as _t
+    if _t.time() - _hub_cache[0] < 60:
+        return _hub_cache[1]
+    try:
+        with _HUB_OPENER.open(urllib.request.Request(HUB_URL + "/v1/models",
+                              headers={"Authorization": "Bearer local-proxy"}), timeout=2) as r:
+            ok = r.status == 200
+    except Exception:
+        ok = False
+    _hub_cache[:] = [_t.time(), ok]
+    return ok
 GEMINI_KEY = get_key_from_env_file("gemini.env", "GEMINI_API_KEY")
 def get_deepseek_key():
     k = get_key_from_env_file("deepseek.env", "DEEPSEEK_API_KEY")
@@ -356,11 +375,10 @@ def generate_deepseek_sentence(word, pinyin="", base_english="", target_lang="�
     except Exception as e:
         return None, f"DeepSeek 调用失败: {e}"
 
-# AI 多样化例句生成 (Qwen)
-def generate_qwen_sentence(word, pinyin="", base_english="", target_lang="英语", difficulty="medium", avoid_sentences=None, scenario="", nonce=""):
-    key = DASHSCOPE_KEY
-    if not key:
-        return None, "未配置百炼 API Key"
+# AI 多样化例句生成（本机模型中心 Gemini）
+def generate_hub_sentence(word, pinyin="", base_english="", target_lang="英语", difficulty="medium", avoid_sentences=None, scenario="", nonce=""):
+    if not hub_ok():
+        return None, "本机模型中心（8318）不在线"
 
     avoid_sentences = avoid_sentences or []
     diff_key = difficulty if difficulty in DIFFICULTY_STANDARDS else "medium"
@@ -414,13 +432,13 @@ def generate_qwen_sentence(word, pinyin="", base_english="", target_lang="英语
 
     prompt += f"\n{lang_prompt}\n\n严格输出纯 JSON 格式：\n{json_schema}"
 
-    url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+    url = HUB_URL + "/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {key}",
+        "Authorization": "Bearer local-proxy",
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "qwen-turbo",
+        "model": HUB_MODEL,
         "messages": [
             {"role": "system", "content": "You are a professional Chinese language teacher. Always respond with pure valid JSON. Never repeat previous example sentences."},
             {"role": "user", "content": prompt}
@@ -431,7 +449,7 @@ def generate_qwen_sentence(word, pinyin="", base_english="", target_lang="英语
 
     try:
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers)
-        with urllib.request.urlopen(req, timeout=7) as resp:
+        with _HUB_OPENER.open(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             content = data["choices"][0]["message"]["content"].strip()
             content = re.sub(r"^```json\s*", "", content)
@@ -601,9 +619,8 @@ def generate_deepseek_exercises(words_list, target_lang="英语", selected_types
 
 def generate_ai_multi_exercises(words_list, target_lang="英语", selected_types=None,
                                 avoid_questions=None, nonce=""):
-    key = DASHSCOPE_KEY
-    if not key:
-        return None, "未配置 API Key"
+    if not hub_ok():
+        return None, "本机模型中心（8318）不在线"
 
     selected_types = selected_types or ["cloze", "order", "dialogue", "collocation"]
 
@@ -722,13 +739,13 @@ def generate_ai_multi_exercises(words_list, target_lang="英语", selected_types
   ]
 }}"""
 
-    url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+    url = HUB_URL + "/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {key}",
+        "Authorization": "Bearer local-proxy",
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "qwen-turbo",
+        "model": HUB_MODEL,
         "messages": [
             {"role": "system", "content": "You are a master Chinese teacher. Respond with pure JSON only."},
             {"role": "user", "content": prompt}
@@ -739,7 +756,7 @@ def generate_ai_multi_exercises(words_list, target_lang="英语", selected_types
 
     try:
         req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers)
-        with urllib.request.urlopen(req, timeout=12) as resp:
+        with _HUB_OPENER.open(req, timeout=45) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             content = data["choices"][0]["message"]["content"].strip()
             content = re.sub(r"^```json\s*", "", content)
@@ -928,12 +945,12 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
                 # 以后谁把 Gemini/v3 加回来，就把名字加进这个列表，选项自动亮。
                 # 2026-09-03 改（小克）：不再写死。qwen/gemini 有 key 才算，google_v3 要凭据文件。
                 "engines": ([e for e, ok in (("deepseek", bool(DEEPSEEK_KEY)),
-                                             ("qwen", bool(DASHSCOPE_KEY)),
+                                             ("hub", hub_ok()),
                                              ("gemini", bool(GEMINI_KEY)),
                                              ("google_v3", bool(GCP_CREDENTIAL_PATH))) if ok]
                             + ["offline"]),
                 "has_deepseek": bool(DEEPSEEK_KEY),
-                "has_dashscope": bool(DASHSCOPE_KEY),
+                "has_hub": hub_ok(),
                 "has_gemini": bool(GEMINI_KEY),
                 "has_gcp_v3": bool(GCP_CREDENTIAL_PATH),
                 "has_neural_tts": True,
@@ -1084,7 +1101,7 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
             body = self.rfile.read(content_length)
             try:
                 data = json.loads(body.decode("utf-8"))
-                global DASHSCOPE_KEY, GEMINI_KEY, DEEPSEEK_KEY
+                global GEMINI_KEY, DEEPSEEK_KEY
                 if data.get("deepseek_key"):
                     DEEPSEEK_KEY = data.get("deepseek_key").strip()
                     key_file = Path.home() / ".config" / "gamekit" / "deepseek.env"
@@ -1092,8 +1109,6 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
                     with open(key_file, "w", encoding="utf-8") as f:
                         f.write(f"DEEPSEEK_API_KEY={DEEPSEEK_KEY}\n")
                     key_file.chmod(0o600)
-                if data.get("dashscope_key"):
-                    DASHSCOPE_KEY = data.get("dashscope_key").strip()
                 if data.get("gemini_key"):
                     GEMINI_KEY = data.get("gemini_key").strip()
                 self.send_json_resp(200, {"ok": True})
@@ -1111,7 +1126,7 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
                 base_english = data.get("english", "").strip()
                 target_lang = data.get("target_lang", "英语").strip() or "英语"
                 difficulty = data.get("difficulty", "medium")
-                engine = data.get("engine", "deepseek" if DEEPSEEK_KEY else "qwen")
+                engine = data.get("engine", "deepseek" if DEEPSEEK_KEY else "hub")
                 avoid_sentences = data.get("avoid_sentences", [])
                 scenario = data.get("scenario", "").strip()
 
@@ -1122,32 +1137,32 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
                     res, err = generate_deepseek_sentence(word, pinyin, base_english, target_lang,
                                                           difficulty=difficulty, avoid_sentences=avoid_sentences, nonce=nonce)
                     used = "deepseek"
-                    if not res and DASHSCOPE_KEY:
-                        res2, err2 = generate_qwen_sentence(word, pinyin, base_english, target_lang,
+                    if not res and hub_ok():
+                        res2, err2 = generate_hub_sentence(word, pinyin, base_english, target_lang,
                                                             difficulty=difficulty, avoid_sentences=avoid_sentences, scenario=scenario, nonce=nonce)
                         if res2:
-                            res, used = res2, "qwen"
-                            err = f"DeepSeek 不可用，已自动切回通义千问"
+                            res, used = res2, "hub"
+                            err = f"DeepSeek 不可用，已自动改用本机模型中心"
                 elif engine == "gemini":
                     res, err = generate_gemini_sentence(word, pinyin, base_english, target_lang,
                                                         difficulty=difficulty, avoid_sentences=avoid_sentences, scenario=scenario, nonce=nonce)
                     used = "gemini"
-                    if not res:   # Gemini 挂了退回 qwen，但要**如实告诉老师退了**
-                        res2, err2 = generate_qwen_sentence(word, pinyin, base_english, target_lang,
+                    if not res:   # Gemini 挂了退回本机中心，但要**如实告诉老师退了**
+                        res2, err2 = generate_hub_sentence(word, pinyin, base_english, target_lang,
                                                             difficulty=difficulty, avoid_sentences=avoid_sentences, scenario=scenario, nonce=nonce)
                         if res2:
-                            res, used = res2, "qwen"
-                            err = f"Gemini 不可用（{err}），已自动改用通义千问"
+                            res, used = res2, "hub"
+                            err = f"Gemini 不可用（{err}），已自动改用本机模型中心"
                 elif engine == "google_v3":
                     # 本机没有 Google Cloud 凭据，这条路走不通，不假装能跑。
-                    res2, err2 = generate_qwen_sentence(word, pinyin, base_english, target_lang,
+                    res2, err2 = generate_hub_sentence(word, pinyin, base_english, target_lang,
                                                         difficulty=difficulty, avoid_sentences=avoid_sentences, scenario=scenario, nonce=nonce)
-                    res, used = res2, "qwen"
-                    err = "Google Cloud Translation 未配置凭据，已自动改用通义千问" if res2 else err2
+                    res, used = res2, "hub"
+                    err = "Google Cloud Translation 未配置凭据，已自动改用本机模型中心" if res2 else err2
                 else:
-                    res, err = generate_qwen_sentence(word, pinyin, base_english, target_lang,
+                    res, err = generate_hub_sentence(word, pinyin, base_english, target_lang,
                                                       difficulty=difficulty, avoid_sentences=avoid_sentences, scenario=scenario, nonce=nonce)
-                    used = "qwen"
+                    used = "hub"
 
                 if res:
                     self.send_json_resp(200, {"ok": True, "data": res,
@@ -1171,12 +1186,12 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
                 # 否则同输入让模型出同样的题，点「重新出一套」看着像没反应。
                 avoid_questions = data.get("avoid_questions", []) or []
                 nonce = str(data.get("nonce", "") or "")
-                engine = data.get("engine", "deepseek" if DEEPSEEK_KEY else "qwen")
+                engine = data.get("engine", "deepseek" if DEEPSEEK_KEY else "hub")
 
                 if engine == "deepseek" and DEEPSEEK_KEY:
                     res, err = generate_deepseek_exercises(words, target_lang, selected_types,
                                                            avoid_questions, nonce)
-                    if not res and DASHSCOPE_KEY:
+                    if not res and hub_ok():
                         res, err = generate_ai_multi_exercises(words, target_lang, selected_types,
                                                                avoid_questions, nonce)
                 else:
