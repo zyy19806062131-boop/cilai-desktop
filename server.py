@@ -1021,7 +1021,7 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
         if req_path in ("/", ""):
             req_path = "/index.html"
         clean_path = req_path.lstrip("/")
-        allowed_files = {"index.html", "dict_data.js"}
+        allowed_files = {"index.html", "dict_data.js", "grammar/grammar.html"}  # 2026-10-19 加：语法速查
         if clean_path in allowed_files or clean_path.startswith("assets/"):
             target_file = (BASE_DIR / clean_path).resolve()
             if str(target_file).startswith(str(BASE_DIR.resolve())) and target_file.is_file():
@@ -1035,6 +1035,36 @@ class AppRequestHandler(SimpleHTTPRequestHandler):
         if not self._origin_ok():
             return
         parsed_url = urllib.parse.urlparse(self.path)
+
+        # 2026-10-19 加（小克）：语法速查里「这条我要用，补一下」。
+        # 页面 fetch 的是 /api/待补，浏览器会把中文路径转成 %E5... 发来，要先解码。
+        if urllib.parse.unquote(parsed_url.path) == "/api/待补":
+            try:
+                n = int(self.headers.get("Content-Length", 0))
+                if n <= 0 or n > 64 * 1024:
+                    raise ValueError("长度不对")
+                item = json.loads(self.rfile.read(n).decode("utf-8"))
+                if not isinstance(item, dict) or not item.get("语法点"):
+                    raise ValueError("没有语法点")
+                item["已补"] = ""
+                # 本机有工作区就写进工作区那份（小克看得到），没有就写用户数据目录
+                ws = Path.home() / "Claude" / "汉语教学" / "lessons" / "_通用课" / "语法速查" / "待补清单.json"
+                todo = ws if ws.parent.is_dir() else DATA_DIR / "语法待补清单.json"
+                todo.parent.mkdir(parents=True, exist_ok=True)
+                d = {"meta": {"这是什么": "语法速查里点「这条我要用，补一下」记下来的派单", "写入方": "词来 server.py /api/待补"}, "条目": []}
+                if todo.exists():
+                    try:
+                        d = json.loads(todo.read_text(encoding="utf-8"))
+                    except json.JSONDecodeError:
+                        pass
+                d.setdefault("条目", []).append(item)
+                todo.write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                self.send_json_resp(200, {"ok": True, "条数": len(d["条目"])})
+            except (ValueError, json.JSONDecodeError) as e:
+                self.send_json_resp(400, {"ok": False, "error": str(e)})
+            except Exception as e:
+                self.send_json_resp(500, {"ok": False, "error": str(e)})
+            return
 
         # 保存/新增学生档案
         if parsed_url.path == "/api/students":

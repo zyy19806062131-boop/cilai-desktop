@@ -11,6 +11,7 @@ lsof -ti tcp:8765 2>/dev/null | xargs -r kill 2>/dev/null || true
 pkill -f "Desktop/词来.app/Contents/MacOS/词来" 2>/dev/null || true
 sleep 1
 
+bash scripts/sync-grammar.sh || { echo "语法速查同步失败，先不打包"; exit 1; }
 node scripts/package-mac.js
 
 echo ""

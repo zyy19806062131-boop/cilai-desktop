@@ -1193,6 +1193,22 @@ main {
   opacity: 1;
 }
 
+/* 2026-10-19 加（小克）：语法速查整页覆盖层。内容是 grammar/grammar.html（生成产物，真源在工作区 汉语教学/lessons/_通用课/语法速查/） */
+#grammarOverlay {
+  position: fixed; inset: 0; z-index: 600; display: none; flex-direction: column;
+  background: var(--bg, #f8f6f2);
+}
+#grammarOverlay.active { display: flex; }
+#grammarOverlay .grammar-bar {
+  display: flex; align-items: center; gap: 12px; padding: 8px 14px 8px 86px; /* 左边让出红绿灯按钮 */
+  border-bottom: 1px solid var(--line); background: var(--panel); flex: 0 0 auto;
+  -webkit-app-region: drag;
+}
+#grammarOverlay .grammar-bar button { -webkit-app-region: no-drag; }
+#grammarOverlay .grammar-bar .grammar-title { font-size: 16px; font-weight: 700; flex: 1; }
+#grammarOverlay .grammar-bar .btn { font-size: 14px; padding: 6px 14px; }
+#grammarFrame { flex: 1 1 auto; width: 100%; border: 0; background: #fff; }
+
 /* 模态框全局样式 */
 .modal-overlay {
   position: fixed;
@@ -1484,6 +1500,15 @@ main {
         <path d="M16 3 A13 13 0 0 1 16 29 Z" fill="#ffffff" opacity="0.25"/>
       </svg>
     </button>
+    <!-- 2026-10-19 加（小克）：语法速查入口，跟「技巧」「设置」并排；图标用 SVG，不用 emoji -->
+    <button class="btn btn-secondary btn-sm" id="btnGrammar" title="语法点速查：上课时查一个语法点怎么讲">
+      <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
+        <rect x="8" y="6" width="32" height="36" rx="5" fill="#b8693a"/>
+        <rect x="12" y="10" width="24" height="28" rx="3" fill="#fff6ea"/>
+        <path d="M17 18 H31 M17 24 H31 M17 30 H26" stroke="#b8693a" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span>语法</span>
+    </button>
     <!-- 3D 技巧灯泡 -->
     <button class="btn btn-secondary btn-sm" id="btnHelp" title="查看使用技巧">
       <svg class="c4d-icon" viewBox="0 0 48 48" fill="none">
@@ -1765,6 +1790,14 @@ main {
 
 
 <!-- 模态框 3：自定义 AI 与密钥设置中心 -->
+<div id="grammarOverlay" role="dialog" aria-label="语法点速查">
+  <div class="grammar-bar">
+    <span class="grammar-title">语法点速查</span>
+    <button type="button" class="btn btn-primary" id="btnGrammarClose" title="回到查词（Esc）">返回查词</button>
+  </div>
+  <iframe id="grammarFrame" title="语法点速查" data-src="grammar/grammar.html"></iframe>
+</div>
+
 <div class="modal-overlay" id="studentModal">
   <div class="modal-window" style="max-width:420px;">
     <div class="modal-header">
@@ -3788,9 +3821,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
   });
 
+  // 2026-10-19 加（小克）：语法速查。第一次点才加载 iframe（页面 1.6MB，不拖慢开 app）；
+  // Esc 在 iframe 里也能退（同源，直接挂监听）。
+  function closeGrammar() { $('#grammarOverlay').classList.remove('active'); $('#wordInput').focus(); }
+  $('#btnGrammar').addEventListener('click', () => {
+    const fr = $('#grammarFrame');
+    if (!fr.getAttribute('src')) {
+      fr.addEventListener('load', () => {
+        try { fr.contentDocument.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeGrammar(); }); } catch (e) {}
+      });
+      fr.setAttribute('src', fr.dataset.src);
+    }
+    $('#grammarOverlay').classList.add('active');
+    try { fr.focus(); } catch (e) {}
+  });
+  $('#btnGrammarClose').addEventListener('click', closeGrammar);
+
   // 16. 快捷键
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
+      if ($('#grammarOverlay').classList.contains('active')) closeGrammar();
       $('#exerciseModal').classList.remove('active');
     }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && window.getSelection().toString() === '') {
